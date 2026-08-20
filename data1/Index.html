@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>학교 전체 게시판</title>
+  <title>자유게시판</title>
   <style>
     * {
       box-sizing: border-box;
@@ -24,18 +24,19 @@
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
-    /* 상단 헤더 영역 */
+    /* 헤더 영역 */
     .board-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 24px;
-      border-bottom: 2px solid #111;
+      border-bottom: 2px solid #222;
       padding-bottom: 16px;
     }
     .board-title {
       font-size: 24px;
       font-weight: bold;
+      color: #111;
     }
     .header-buttons {
       display: flex;
@@ -59,14 +60,14 @@
       background-color: #5a6268;
     }
     .btn-write {
-      background-color: #007bff;
+      background-color: #28a745;
       color: white;
     }
     .btn-write:hover {
-      background-color: #0056b3;
+      background-color: #218838;
     }
 
-    /* 게시판 테이블 영역 */
+    /* 게시판 테이블 */
     .board-table {
       width: 100%;
       border-collapse: collapse;
@@ -94,7 +95,7 @@
     }
     .title-col a:hover {
       text-decoration: underline;
-      color: #007bff;
+      color: #28a745;
     }
     .notice {
       background-color: #fff9db;
@@ -124,22 +125,21 @@
       font-size: 14px;
     }
     .pagination a.active {
-      background-color: #007bff;
+      background-color: #28a745;
       color: white;
-      border-color: #007bff;
+      border-color: #28a745;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- 헤더: 타이틀 및 버튼 -->
+    <!-- 헤더 영역 -->
     <div class="board-header">
-      <h1 class="board-title">전체 게시판</h1>
+      <h1 class="board-title">💬 자유게시판</h1>
       <div class="header-buttons">
-        <!-- 메인 페이지로 돌아가는 버튼 (상대 경로) -->
         <a href="../" class="btn btn-home">메인으로</a>
-        <a href="#" class="btn btn-write" onclick="alert('글쓰기 페이지 연결 필요'); return false;">글쓰기</a>
+        <a href="#" class="btn btn-write" onclick="alert('글쓰기 페이지 준비 중입니다.'); return false;">글쓰기</a>
       </div>
     </div>
 
@@ -160,44 +160,44 @@
           <td>공지</td>
           <td class="title-col">
             <span class="badge">필독</span>
-            <a href="#" onclick="alert('글 상세 페이지 연결 필요'); return false;">학교 게시판 이용 수칙 안내</a>
+            <a href="#" onclick="alert('공지사항 페이지 준비 중입니다.'); return false;">자유게시판 이용 수칙 및 매너 안내</a>
           </td>
           <td>관리자</td>
           <td>2026.08.20</td>
-          <td>142</td>
+          <td>180</td>
         </tr>
-        <!-- 일반 게시글 예시 -->
+        <!-- 자유게시판 예시 글 목록 -->
         <tr>
           <td>3</td>
           <td class="title-col">
-            <a href="#" onclick="alert('글 상세 페이지 연결 필요'); return false;">다음 주 동아리 활동 일정 공지</a>
+            <a href="#" onclick="alert('상세보기 준비 중입니다.'); return false;">오늘 급식 메뉴 진짜 대박이네요 ㅋㅋㅋ</a>
           </td>
-          <td>학생회</td>
-          <td>2026.08.19</td>
-          <td>45</td>
+          <td>익명1</td>
+          <td>2026.08.20</td>
+          <td>32</td>
         </tr>
         <tr>
           <td>2</td>
           <td class="title-col">
-            <a href="#" onclick="alert('글 상세 페이지 연결 필요'); return false;">정독실 이용 관련 건의사항</a>
+            <a href="#" onclick="alert('상세보기 준비 중입니다.'); return false;">정독실 자리 관련해서 다들 의견 어떠신가요?</a>
           </td>
           <td>강우현</td>
-          <td>2026.08.18</td>
-          <td>28</td>
+          <td>2026.08.19</td>
+          <td>45</td>
         </tr>
         <tr>
           <td>1</td>
           <td class="title-col">
-            <a href="#" onclick="alert('글 상세 페이지 연결 필요'); return false;">게시판 오픈 테스트 글입니다.</a>
+            <a href="#" onclick="alert('상세보기 준비 중입니다.'); return false;">자유게시판 첫 글 작성해봅니다!</a>
           </td>
           <td>홍길동</td>
-          <td>2026.08.17</td>
-          <td>12</td>
+          <td>2026.08.18</td>
+          <td>15</td>
         </tr>
       </tbody>
     </table>
 
-    <!-- 하단 페이지 번호 -->
+    <!-- 페이지 번호 -->
     <div class="pagination">
       <a href="#" class="active">1</a>
       <a href="#">2</a>
@@ -207,4 +207,3 @@
 
 </body>
 </html>
-
