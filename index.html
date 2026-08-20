@@ -68,11 +68,20 @@
         </button>
       </nav>
 
-      <!-- User Badge -->
+      <!-- User & Admin Status Badge -->
       <div class="flex items-center gap-2">
-        <span id="user-badge" class="text-xs bg-indigo-800 border border-indigo-700 px-3 py-1.5 rounded-full flex items-center gap-1">
-          <i data-lucide="user" class="w-3.5 h-3.5"></i> <span id="user-id-text">익명 학생</span>
-        </span>
+        <div id="admin-indicator" class="hidden flex items-center gap-2">
+          <button onclick="openAdminDashboard()" class="bg-amber-400 hover:bg-amber-300 text-indigo-950 font-bold text-xs px-3 py-1.5 rounded-full flex items-center gap-1 shadow">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> <span id="admin-name-tag">관리자</span>
+          </button>
+          <button onclick="logoutAdmin()" class="bg-indigo-800 text-indigo-200 hover:text-white text-xs px-2.5 py-1.5 rounded-lg">
+            로그아웃
+          </button>
+        </div>
+
+        <button id="admin-login-btn" onclick="openAdminModal()" class="text-xs bg-indigo-800 border border-indigo-700 hover:bg-indigo-700 px-3 py-1.5 rounded-full flex items-center gap-1 text-indigo-100 transition">
+          <i data-lucide="lock" class="w-3.5 h-3.5"></i> 관리자 로그인
+        </button>
       </div>
     </div>
 
@@ -102,6 +111,12 @@
     </div>
   </header>
 
+  <!-- Admin Bar Banner -->
+  <div id="admin-top-banner" class="hidden bg-amber-500 text-indigo-950 text-xs font-bold py-2 px-4 shadow-inner text-center flex items-center justify-center gap-2">
+    <i data-lucide="shield-alert" class="w-4 h-4"></i>
+    <span>현재 관리자 권한으로 로그인 중입니다. (삭제 확인 절차 후 즉시 삭제 처리됩니다)</span>
+  </div>
+
   <!-- Main Container -->
   <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6">
 
@@ -115,7 +130,7 @@
         <div class="relative z-10 max-w-xl">
           <span class="bg-amber-400 text-indigo-950 font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wide">Peniel High School</span>
           <h2 class="text-2xl md:text-4xl font-extrabold mt-3 mb-2 leading-tight">브니엘고등학교 소통 공간입니다!</h2>
-          <p class="text-indigo-200 text-sm md:text-base">공지사항, 자유게시판, Q&A, 동아리 소식부터 오늘의 맛있는 급식 메뉴까지 한곳에서 확인하세요.</p>
+          <p class="text-indigo-200 text-sm md:text-base">공지사항, 자유게시판, Q&A, 동아리 소식부터 달력 학사일정과 급식표까지 한곳에서 확인하세요.</p>
           <div class="mt-6 flex flex-wrap gap-3">
             <button onclick="openPostModal('자유')" class="bg-amber-400 hover:bg-amber-300 text-indigo-950 font-bold px-4 py-2.5 rounded-xl shadow text-sm transition flex items-center gap-2">
               <i data-lucide="pen-tool" class="w-4 h-4"></i> 자유게시물 쓰기
@@ -211,6 +226,9 @@
           <h2 class="text-xl font-bold text-slate-800">학교 공지사항</h2>
           <p class="text-xs text-slate-500">브니엘고등학교의 중요 소식 및 가정통신문입니다.</p>
         </div>
+        <button id="admin-notice-btn" onclick="openPostModal('공지')" class="hidden bg-amber-500 hover:bg-amber-600 text-indigo-950 font-bold px-4 py-2.5 rounded-xl shadow text-xs transition flex items-center justify-center gap-2">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i> 관리자 공지 작성
+        </button>
       </div>
 
       <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
@@ -223,7 +241,7 @@
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
         <div>
           <h2 class="text-xl font-bold text-slate-800">자유 게시판</h2>
-          <p class="text-xs text-slate-500">브니엘고 학생들의 자유로운 소통 공간입니다. 게시글을 클릭하면 상세 내용과 댓글을 볼 수 있습니다.</p>
+          <p class="text-xs text-slate-500">브니엘고 학생들의 자유로운 소통 공간입니다.</p>
         </div>
         <button onclick="openPostModal('자유')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl shadow text-xs transition flex items-center justify-center gap-2">
           <i data-lucide="square-pen" class="w-4 h-4"></i> 글 작성하기
@@ -263,17 +281,50 @@
       <div id="posts-container-club" class="space-y-4"></div>
     </section>
 
-    <!-- Tab 6: ACADEMIC CALENDAR PAGE -->
+    <!-- Tab 6: ACADEMIC CALENDAR & INTERACTIVE CALENDAR PAGE -->
     <section id="tab-calendar" class="hidden space-y-6">
-      <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-        <h2 class="text-xl font-bold text-slate-800 mb-1">2026학년도 주요 학사일정</h2>
-        <p class="text-xs text-slate-500">브니엘고등학교의 월별 주요 행사 및 시험 일정입니다.</p>
+      <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800 mb-1">2026학년도 브니엘고 학사일정 달력</h2>
+          <p class="text-xs text-slate-500">달력에서 월별 학교 일정과 주요 시험 및 행사를 확인하세요.</p>
+        </div>
+        <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+          <button onclick="changeCalendarMonth(-1)" class="p-2 hover:bg-white rounded-lg transition text-slate-600">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+          </button>
+          <span id="calendar-month-title" class="text-sm font-bold px-3 text-indigo-950">2026년 8월</span>
+          <button onclick="changeCalendarMonth(1)" class="p-2 hover:bg-white rounded-lg transition text-slate-600">
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
       </div>
 
+      <!-- Calendar Grid View -->
+      <div class="bg-white rounded-2xl p-4 md:p-6 border border-slate-100 shadow-sm overflow-x-auto">
+        <div class="min-w-[600px]">
+          <!-- Weekday Header -->
+          <div class="grid grid-cols-7 text-center font-bold text-xs text-slate-400 border-b border-slate-100 pb-3 mb-2">
+            <span class="text-rose-500">일</span>
+            <span>월</span>
+            <span>화</span>
+            <span>수</span>
+            <span>목</span>
+            <span>금</span>
+            <span class="text-indigo-600">토</span>
+          </div>
+
+          <!-- Calendar Days Grid -->
+          <div id="calendar-grid" class="grid grid-cols-7 gap-1 md:gap-2">
+            <!-- Dynamically Rendered Calendar Days -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Academic Schedule List -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
           <h3 class="font-bold text-indigo-900 border-b pb-2 mb-3 flex items-center gap-2">
-            <i data-lucide="calendar-days" class="w-4 h-4 text-indigo-600"></i> 8월 ~ 9월 일정
+            <i data-lucide="calendar-days" class="w-4 h-4 text-indigo-600"></i> 2학기 주요 일정 (8월~10월)
           </h3>
           <ul class="space-y-2.5 text-xs">
             <li class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
@@ -288,29 +339,37 @@
               <span class="font-bold text-indigo-900">9월 22일 ~ 25일</span>
               <span class="font-bold text-indigo-700">2학기 중간고사</span>
             </li>
+            <li class="flex justify-between items-center bg-amber-50 border border-amber-100 p-2.5 rounded-xl">
+              <span class="font-bold text-amber-900">10월 02일 (금)</span>
+              <span class="font-bold text-amber-700">재량휴업일</span>
+            </li>
+            <li class="flex justify-between items-center bg-emerald-50 border border-emerald-100 p-2.5 rounded-xl">
+              <span class="font-bold text-emerald-900">10월 17일 (금)</span>
+              <span class="font-bold text-emerald-700">브니엘 예술축제 및 동아리 발표회</span>
+            </li>
           </ul>
         </div>
 
         <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
           <h3 class="font-bold text-indigo-900 border-b pb-2 mb-3 flex items-center gap-2">
-            <i data-lucide="calendar-days" class="w-4 h-4 text-indigo-600"></i> 10월 ~ 12월 일정
+            <i data-lucide="calendar-days" class="w-4 h-4 text-indigo-600"></i> 2학기 주요 일정 (11월~1월)
           </h3>
           <ul class="space-y-2.5 text-xs">
-            <li class="flex justify-between items-center bg-emerald-50 border border-emerald-100 p-2.5 rounded-xl">
-              <span class="font-bold text-emerald-900">10월 17일 (금)</span>
-              <span class="font-bold text-emerald-700">브니엘 예술축제</span>
-            </li>
             <li class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
               <span class="font-semibold text-slate-700">11월 19일 (목)</span>
-              <span class="text-slate-600">대학수학능력시험</span>
+              <span class="text-slate-600 font-bold text-indigo-900">대학수학능력시험 (수능)</span>
             </li>
             <li class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
               <span class="font-semibold text-slate-700">12월 08일 ~ 11일</span>
               <span class="text-slate-600">2학기 기말고사</span>
             </li>
-            <li class="flex justify-between items-center bg-amber-50 border border-amber-100 p-2.5 rounded-xl">
-              <span class="font-bold text-amber-900">12월 28일 (월)</span>
-              <span class="font-bold text-amber-700">겨울방학식</span>
+            <li class="flex justify-between items-center bg-indigo-50 border border-indigo-100 p-2.5 rounded-xl">
+              <span class="font-bold text-indigo-900">12월 28일 (월)</span>
+              <span class="font-bold text-indigo-700">겨울방학식</span>
+            </li>
+            <li class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
+              <span class="font-semibold text-slate-700">2027년 2월 05일</span>
+              <span class="text-slate-600 font-bold">제 50회 졸업식 및 종업식</span>
             </li>
           </ul>
         </div>
@@ -394,6 +453,7 @@
             <option value="자유">💬 자유 게시판</option>
             <option value="질문">❓ Q&A 질문답변</option>
             <option value="동아리">🎨 동아리 / 학생회</option>
+            <option id="admin-notice-option" value="공지" class="hidden font-bold text-indigo-600">📢 [관리자 전용] 공지사항</option>
           </select>
         </div>
 
@@ -420,16 +480,21 @@
     </div>
   </div>
 
-  <!-- Detailed View & Comment Modal (POST DETAIL POPUP) -->
+  <!-- Post Detail & Comment Modal -->
   <div id="detail-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
     <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] shadow-2xl flex flex-col overflow-hidden border border-slate-100">
       
       <!-- Modal Header -->
       <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
         <span id="detail-board-badge" class="bg-indigo-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-full">자유</span>
-        <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
+        <div class="flex items-center gap-2">
+          <button id="admin-delete-post-btn" onclick="triggerDeletePostPrompt()" class="hidden bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-1 rounded-lg flex items-center gap-1">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> 게시글 삭제
+          </button>
+          <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
       </div>
 
       <!-- Modal Body (Scrollable) -->
@@ -479,6 +544,110 @@
     </div>
   </div>
 
+  <!-- Admin Delete Confirmation Warning Modal -->
+  <div id="delete-confirm-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl p-5 border border-slate-100 text-center space-y-4">
+      <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto">
+        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h3 class="font-bold text-slate-800 text-base" id="delete-confirm-title">정말로 삭제하시겠습니까?</h3>
+        <p class="text-xs text-slate-500 mt-1" id="delete-confirm-desc">삭제된 데이터는 복구할 수 없습니다.</p>
+      </div>
+      <div class="flex justify-center gap-2 pt-2">
+        <button onclick="closeDeleteConfirmModal()" class="w-1/2 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50">취소</button>
+        <button id="confirm-delete-action-btn" class="w-1/2 py-2.5 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700 shadow">삭제하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Login Modal -->
+  <div id="admin-login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden border border-slate-100">
+      <div class="bg-indigo-950 text-white p-5 text-center relative">
+        <div class="w-12 h-12 bg-amber-400 text-indigo-950 rounded-full flex items-center justify-center mx-auto mb-2 font-bold shadow">
+          <i data-lucide="shield" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-bold text-base">브니엘고 관리자 로그인</h3>
+        <p class="text-xs text-indigo-200 mt-1">지정된 4인 전용 관리자 암호를 입력하세요.</p>
+        <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-indigo-300 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleAdminLogin(event)" class="p-5 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">관리자 비밀번호</label>
+          <input type="password" id="admin-password-input" required placeholder="비밀번호 입력" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+          <p id="admin-login-error" class="hidden text-rose-500 text-[11px] mt-1 font-medium">비밀번호가 올바르지 않습니다.</p>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-[11px] text-slate-500 space-y-1">
+          <p class="font-bold text-slate-700">💡 시범 관리자 암호 4개:</p>
+          <p>• 관리자 1: <code class="bg-slate-200 px-1 rounded text-indigo-900 font-bold">peniel101</code></p>
+          <p>• 관리자 2: <code class="bg-slate-200 px-1 rounded text-indigo-900 font-bold">peniel102</code></p>
+          <p>• 관리자 3: <code class="bg-slate-200 px-1 rounded text-indigo-900 font-bold">peniel103</code></p>
+          <p>• 관리자 4: <code class="bg-slate-200 px-1 rounded text-indigo-900 font-bold">peniel104</code></p>
+        </div>
+
+        <button type="submit" class="w-full bg-indigo-900 text-amber-400 font-bold py-2.5 rounded-xl text-xs hover:bg-indigo-800 transition shadow">
+          인증 및 접속하기
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard Modal -->
+  <div id="admin-dashboard-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100">
+      <div class="bg-amber-500 text-indigo-950 p-4 flex justify-between items-center">
+        <h3 class="font-bold text-sm flex items-center gap-1.5">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i> 관리자 대시보드
+        </h3>
+        <button onclick="closeAdminDashboard()" class="text-indigo-950 hover:opacity-75">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <div class="flex items-center gap-3 bg-indigo-50 p-3.5 rounded-xl border border-indigo-100">
+          <div class="w-10 h-10 bg-indigo-900 text-amber-400 rounded-full flex items-center justify-center font-bold">
+            <i data-lucide="user-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="text-xs text-indigo-600 font-bold block">현재 승인된 접속자</span>
+            <span id="dash-admin-name" class="text-sm font-extrabold text-indigo-950">관리자 1</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+            <span class="text-[11px] text-slate-500">전체 게시글</span>
+            <span id="dash-total-posts" class="block text-xl font-black text-slate-800 mt-0.5">0</span>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
+            <span class="text-[11px] text-slate-500">등록된 댓글</span>
+            <span id="dash-total-comments" class="block text-xl font-black text-indigo-600 mt-0.5">0</span>
+          </div>
+        </div>
+
+        <div class="border-t border-slate-100 pt-3">
+          <h4 class="font-bold text-xs text-slate-700 mb-2">등록된 4인 관리자 명단</h4>
+          <ul class="text-xs space-y-1.5 text-slate-600">
+            <li class="flex justify-between bg-slate-50 p-2 rounded-lg"><span>1번 관리자 (peniel101)</span> <span class="text-emerald-600 font-bold">활성</span></li>
+            <li class="flex justify-between bg-slate-50 p-2 rounded-lg"><span>2번 관리자 (peniel102)</span> <span class="text-emerald-600 font-bold">활성</span></li>
+            <li class="flex justify-between bg-slate-50 p-2 rounded-lg"><span>3번 관리자 (peniel103)</span> <span class="text-emerald-600 font-bold">활성</span></li>
+            <li class="flex justify-between bg-slate-50 p-2 rounded-lg"><span>4번 관리자 (peniel104)</span> <span class="text-emerald-600 font-bold">활성</span></li>
+          </ul>
+        </div>
+
+        <div class="pt-2 text-right">
+          <button onclick="logoutAdmin()" class="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700">관리자 로그아웃</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Notice Detail Modal -->
   <div id="notice-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
     <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100">
@@ -511,11 +680,11 @@
     </div>
   </footer>
 
-  <!-- Firebase Logic Script -->
+  <!-- Firebase & App Logic Script -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
     import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-    import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+    import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
     // Firebase Global Setup
     const firebaseConfig = typeof __firebase_config !== 'undefined' 
@@ -528,17 +697,51 @@
     const db = getFirestore(app);
 
     let currentUser = null;
+    let currentAdminRole = null; 
     let allPosts = [];
     let activePostId = null;
+    let pendingDeleteAction = null;
 
-    // Static Notices
+    /*
+      ==========================================================
+      💡 [관리자 비밀번호 설정 가이드]
+      원하시는 4가지 비밀번호로 따옴표 안의 문자를 변경해 사용하세요!
+      ==========================================================
+    */
+    const ADMIN_PASSWORDS = {
+      'peniel101': '관리자 1 (학생회장)',
+      'peniel102': '관리자 2 (부학생회장)',
+      'peniel103': '관리자 3 (선도부장)',
+      'peniel104': '관리자 4 (담당교사)'
+    };
+
+    // 학사일정 달력 데이터 (2026년 기준)
+    const ACADEMIC_EVENTS = {
+      "2026-08-18": { title: "2학기 개학식", type: "blue" },
+      "2026-09-03": { title: "모의고사", type: "indigo" },
+      "2026-09-22": { title: "중간고사 시작", type: "red" },
+      "2026-09-23": { title: "중간고사 2일차", type: "red" },
+      "2026-09-24": { title: "중간고사 3일차", type: "red" },
+      "2026-09-25": { title: "중간고사 종료", type: "red" },
+      "2026-10-02": { title: "재량휴업일", type: "amber" },
+      "2026-10-17": { title: "브니엘 축제", type: "emerald" },
+      "2026-11-19": { title: "대학수능시험", type: "red" },
+      "2026-12-08": { title: "기말고사 시작", type: "red" },
+      "2026-12-11": { title: "기말고사 종료", type: "red" },
+      "2026-12-28": { title: "겨울방학식", type: "amber" }
+    };
+
+    let calendarYear = 2026;
+    let calendarMonth = 8; // 8월 기본값
+
+    // Static Base Notices
     const defaultNotices = [
       {
         id: 'n1',
         title: '2026학년도 2학기 학사 일정 및 중간고사 시간표 안내',
         date: '2026.08.18',
         tag: '학사일정',
-        content: '2학기 중간고사는 9월 22일부터 9월 25일까지 진행됩니다. 시험 범위 및 과목별 세부 안내 사항은 각 교과 선생님을 통해 전달됩니다. 최선을 다해 준비해 주세요!',
+        content: '2학기 중간고사는 9월 22일부터 9월 25일까지 진행됩니다. 세부 공부 일정 및 준비사항을 점검해 주세요.',
         important: true
       },
       {
@@ -546,20 +749,11 @@
         title: '동아리 발표회 및 브니엘 예술축제 부스 신청 안내',
         date: '2026.08.15',
         tag: '축제',
-        content: '10월 17일에 열리는 브니엘 예술축제 부스 운영을 희망하는 동아리는 9월 10일까지 학생회 소통창구 및 신청서를 제출해 주세요.',
-        important: false
-      },
-      {
-        id: 'n3',
-        title: '도서관 신간 도서 신청 및 교내 독서 캠프 참가자 모집',
-        date: '2026.08.10',
-        tag: '도서관',
-        content: '2학기 1차 희망 도서 신청을 받습니다. 도서관 홈페이지 또는 도서부 학생들에게 원하는 책 목록을 전달해 주시면 구매 반영됩니다.',
+        content: '10월 17일에 열리는 브니엘 예술축제 부스 운영을 희망하는 동아리는 신청서를 제출해 주세요.',
         important: false
       }
     ];
 
-    // Auth Initialization
     window.addEventListener('DOMContentLoaded', async () => {
       lucide.createIcons();
 
@@ -576,14 +770,122 @@
       onAuthStateChanged(auth, (user) => {
         if (user) {
           currentUser = user;
-          const shortId = user.uid.substring(0, 5);
-          document.getElementById('user-id-text').innerText = `익명 (ID: ${shortId})`;
           initPostsListener();
         }
       });
 
       renderNotices();
+      renderCalendar(calendarYear, calendarMonth);
     });
+
+    // Calendar Renderer
+    function renderCalendar(year, month) {
+      document.getElementById('calendar-month-title').innerText = `${year}년 ${month}월`;
+      const grid = document.getElementById('calendar-grid');
+      grid.innerHTML = '';
+
+      const firstDay = new Date(year, month - 1, 1).getDay();
+      const lastDate = new Date(year, month, 0).getDate();
+
+      // Empty lead cells
+      for (let i = 0; i < firstDay; i++) {
+        grid.innerHTML += `<div class="h-20 bg-slate-50/50 rounded-xl"></div>`;
+      }
+
+      // Date cells
+      for (let day = 1; day <= lastDate; day++) {
+        const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const event = ACADEMIC_EVENTS[dateStr];
+
+        let badgeHtml = '';
+        if (event) {
+          const colorClasses = {
+            red: 'bg-rose-100 text-rose-700 border-rose-200',
+            blue: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+            indigo: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+            amber: 'bg-amber-100 text-amber-800 border-amber-200',
+            emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200'
+          };
+          badgeHtml = `<span class="block mt-1 text-[10px] font-bold p-1 rounded-md border ${colorClasses[event.type] || 'bg-slate-100'} truncate">${event.title}</span>`;
+        }
+
+        const isToday = day === 20 && month === 8 && year === 2026;
+
+        grid.innerHTML += `
+          <div class="h-20 bg-white p-1.5 rounded-xl border ${isToday ? 'border-2 border-indigo-600 bg-indigo-50/30' : 'border-slate-100'} flex flex-col justify-between">
+            <span class="text-xs font-bold ${isToday ? 'text-indigo-600' : 'text-slate-700'}">${day}</span>
+            <div class="overflow-hidden">${badgeHtml}</div>
+          </div>
+        `;
+      }
+    }
+
+    window.changeCalendarMonth = (delta) => {
+      calendarMonth += delta;
+      if (calendarMonth > 12) {
+        calendarMonth = 1;
+        calendarYear++;
+      } else if (calendarMonth < 1) {
+        calendarMonth = 12;
+        calendarYear--;
+      }
+      renderCalendar(calendarYear, calendarMonth);
+    };
+
+    // Admin Login Handler
+    window.handleAdminLogin = (e) => {
+      e.preventDefault();
+      const pwdInput = document.getElementById('admin-password-input');
+      const pwd = pwdInput.value.trim();
+      const errText = document.getElementById('admin-login-error');
+
+      if (ADMIN_PASSWORDS[pwd]) {
+        currentAdminRole = ADMIN_PASSWORDS[pwd];
+        pwdInput.value = '';
+        errText.classList.add('hidden');
+        closeAdminModal();
+        applyAdminUIState();
+      } else {
+        errText.classList.remove('hidden');
+      }
+    };
+
+    window.logoutAdmin = () => {
+      currentAdminRole = null;
+      applyAdminUIState();
+      closeAdminDashboard();
+    };
+
+    function applyAdminUIState() {
+      const loginBtn = document.getElementById('admin-login-btn');
+      const indicator = document.getElementById('admin-indicator');
+      const adminTag = document.getElementById('admin-name-tag');
+      const adminNoticeOption = document.getElementById('admin-notice-option');
+      const adminNoticeBtn = document.getElementById('admin-notice-btn');
+      const adminTopBanner = document.getElementById('admin-top-banner');
+
+      if (currentAdminRole) {
+        loginBtn.classList.add('hidden');
+        indicator.classList.remove('hidden');
+        adminTag.innerText = currentAdminRole;
+        adminNoticeOption.classList.remove('hidden');
+        adminNoticeBtn.classList.remove('hidden');
+        adminTopBanner.classList.remove('hidden');
+      } else {
+        loginBtn.classList.remove('hidden');
+        indicator.classList.add('hidden');
+        adminNoticeOption.classList.add('hidden');
+        adminNoticeBtn.classList.add('hidden');
+        adminTopBanner.classList.add('hidden');
+      }
+
+      renderPostsByBoard();
+      if (activePostId) {
+        const post = allPosts.find(p => p.id === activePostId);
+        if (post) renderPostDetailModal(post);
+      }
+      lucide.createIcons();
+    }
 
     // Realtime Listener for Posts
     function initPostsListener() {
@@ -597,12 +899,10 @@
           allPosts.push({ id: doc.id, ...doc.data() });
         });
 
-        // Sort descending
         allPosts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
         renderPostsByBoard();
         
-        // Refresh detail modal if open
         if (activePostId) {
           const updatedPost = allPosts.find(p => p.id === activePostId);
           if (updatedPost) renderPostDetailModal(updatedPost);
@@ -617,13 +917,23 @@
       const homeList = document.getElementById('home-notice-list');
       const fullList = document.getElementById('notice-full-list');
 
-      homeList.innerHTML = defaultNotices.slice(0, 3).map(n => `
+      const noticePosts = allPosts.filter(p => p.boardType === '공지');
+
+      homeList.innerHTML = defaultNotices.slice(0, 2).map(n => `
         <div onclick="window.openNoticeModal('${n.id}')" class="flex items-center justify-between p-2.5 hover:bg-slate-50 rounded-xl transition cursor-pointer border border-transparent hover:border-slate-100">
           <div class="flex items-center gap-2 overflow-hidden">
             ${n.important ? `<span class="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded">필독</span>` : ''}
             <span class="text-xs text-slate-800 font-medium truncate">${n.title}</span>
           </div>
           <span class="text-[11px] text-slate-400 shrink-0">${n.date}</span>
+        </div>
+      `).join('') + noticePosts.slice(0, 2).map(p => `
+        <div onclick="window.openPostDetail('${p.id}')" class="flex items-center justify-between p-2.5 hover:bg-slate-50 rounded-xl transition cursor-pointer border border-transparent hover:border-slate-100">
+          <div class="flex items-center gap-2 overflow-hidden">
+            <span class="bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded">공지</span>
+            <span class="text-xs text-slate-800 font-medium truncate">${escapeHtml(p.title)}</span>
+          </div>
+          <span class="text-[11px] text-slate-400 shrink-0">${p.dateStr}</span>
         </div>
       `).join('');
 
@@ -636,10 +946,22 @@
           <h4 class="font-bold text-sm text-slate-800 mb-1">${n.title}</h4>
           <p class="text-xs text-slate-600 line-clamp-1">${n.content}</p>
         </div>
+      `).join('') + noticePosts.map(p => `
+        <div onclick="window.openPostDetail('${p.id}')" class="p-4 hover:bg-slate-50 transition cursor-pointer border-l-4 border-amber-400">
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-2">
+              <span class="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full">공지사항</span>
+              <span class="text-xs text-slate-400">${p.dateStr}</span>
+            </div>
+            ${currentAdminRole ? `<button onclick="event.stopPropagation(); window.triggerDeletePostPromptDirect('${p.id}')" class="text-rose-600 text-xs font-bold hover:underline">삭제</button>` : ''}
+          </div>
+          <h4 class="font-bold text-sm text-slate-800 mb-1">${escapeHtml(p.title)}</h4>
+          <p class="text-xs text-slate-600 line-clamp-1">${escapeHtml(p.content)}</p>
+        </div>
       `).join('');
     }
 
-    // Render Posts into Specific Boards
+    // Render Posts by Category
     function renderPostsByBoard() {
       const freePosts = allPosts.filter(p => (p.boardType || '자유') === '자유');
       const qnaPosts = allPosts.filter(p => p.boardType === '질문');
@@ -648,8 +970,9 @@
       renderBoardFeed('posts-container-free', freePosts);
       renderBoardFeed('posts-container-qna', qnaPosts);
       renderBoardFeed('posts-container-club', clubPosts);
+      renderNotices();
 
-      // Render Home Recent Free Feed
+      // Render Home Recent Feed
       const homeFreeList = document.getElementById('home-free-list');
       if (freePosts.length === 0) {
         homeFreeList.innerHTML = `<p class="text-xs text-slate-400 py-2">등록된 자유게시물이 없습니다.</p>`;
@@ -687,10 +1010,13 @@
         const isLikedByMe = currentUser && post.likedUsers && post.likedUsers.includes(currentUser.uid);
 
         return `
-          <div onclick="window.openPostDetail('${post.id}')" class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition cursor-pointer">
+          <div onclick="window.openPostDetail('${post.id}')" class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition cursor-pointer relative">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-lg">${post.author || '익명'}</span>
-              <span class="text-[11px] text-slate-400">${post.dateStr || ''}</span>
+              <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-lg">${escapeHtml(post.author || '익명')}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-[11px] text-slate-400">${post.dateStr || ''}</span>
+                ${currentAdminRole ? `<button onclick="event.stopPropagation(); window.triggerDeletePostPromptDirect('${post.id}')" class="text-rose-600 text-xs font-bold hover:bg-rose-50 px-2 py-0.5 rounded">삭제</button>` : ''}
+              </div>
             </div>
             <h3 class="font-bold text-base text-slate-800 mb-1.5">${escapeHtml(post.title)}</h3>
             <p class="text-xs text-slate-600 line-clamp-2 mb-4 leading-relaxed">${escapeHtml(post.content)}</p>
@@ -709,7 +1035,7 @@
       lucide.createIcons();
     }
 
-    // Open Post Detail Modal Popup
+    // Open Detail Modal
     window.openPostDetail = (postId) => {
       activePostId = postId;
       const post = allPosts.find(p => p.id === postId);
@@ -726,6 +1052,13 @@
       document.getElementById('detail-title').innerText = post.title;
       document.getElementById('detail-content').innerText = post.content;
 
+      const adminDeletePostBtn = document.getElementById('admin-delete-post-btn');
+      if (currentAdminRole) {
+        adminDeletePostBtn.classList.remove('hidden');
+      } else {
+        adminDeletePostBtn.classList.add('hidden');
+      }
+
       const likedUsers = post.likedUsers || [];
       const likesCount = likedUsers.length;
       const isLiked = currentUser && likedUsers.includes(currentUser.uid);
@@ -739,7 +1072,7 @@
         likeBtn.className = "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition border border-slate-200 text-slate-600 hover:bg-slate-50";
       }
 
-      // Render Comments
+      // Comments
       const comments = post.comments || [];
       document.getElementById('detail-comments-count').innerText = comments.length;
       
@@ -751,7 +1084,10 @@
           <div class="bg-slate-50 p-3 rounded-xl text-xs border border-slate-100">
             <div class="flex justify-between items-center mb-1">
               <span class="font-bold text-slate-700">${escapeHtml(c.author)}</span>
-              <span class="text-[10px] text-slate-400">${c.dateStr || ''}</span>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] text-slate-400">${c.dateStr || ''}</span>
+                ${currentAdminRole ? `<button onclick="window.triggerDeleteCommentPrompt('${c.id}')" class="text-rose-600 text-[10px] font-bold hover:underline">삭제</button>` : ''}
+              </div>
             </div>
             <p class="text-slate-600 whitespace-pre-line">${escapeHtml(c.text)}</p>
           </div>
@@ -761,7 +1097,66 @@
       lucide.createIcons();
     }
 
-    // Single-Like Toggle (1 Person = 1 Like Limit)
+    /*
+      ==========================================================
+      🔔 [관리자 삭제 경고 및 confirmation 모달 로직]
+      ==========================================================
+    */
+    window.triggerDeletePostPrompt = () => {
+      if (!currentAdminRole || !activePostId) return;
+      document.getElementById('delete-confirm-title').innerText = "이 게시글을 삭제하시겠습니까?";
+      document.getElementById('delete-confirm-desc').innerText = "삭제된 게시글 및 댓글은 영구적으로 복구할 수 없습니다.";
+
+      pendingDeleteAction = async () => {
+        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'posts', activePostId));
+        closeDetailModal();
+      };
+
+      document.getElementById('delete-confirm-modal').classList.remove('hidden');
+    };
+
+    window.triggerDeletePostPromptDirect = (postId) => {
+      if (!currentAdminRole) return;
+      document.getElementById('delete-confirm-title').innerText = "선택한 게시글을 삭제하시겠습니까?";
+      document.getElementById('delete-confirm-desc').innerText = "삭제된 데이터는 복구할 수 없습니다.";
+
+      pendingDeleteAction = async () => {
+        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'posts', postId));
+      };
+
+      document.getElementById('delete-confirm-modal').classList.remove('hidden');
+    };
+
+    window.triggerDeleteCommentPrompt = (commentId) => {
+      if (!currentAdminRole || !activePostId) return;
+      document.getElementById('delete-confirm-title').innerText = "해당 댓글을 삭제하시겠습니까?";
+      document.getElementById('delete-confirm-desc').innerText = "선택한 댓글이 삭제됩니다.";
+
+      pendingDeleteAction = async () => {
+        const post = allPosts.find(p => p.id === activePostId);
+        if (!post) return;
+        const updatedComments = (post.comments || []).filter(c => c.id !== commentId);
+        const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'posts', activePostId);
+        await updateDoc(postRef, { comments: updatedComments });
+      };
+
+      document.getElementById('delete-confirm-modal').classList.remove('hidden');
+    };
+
+    document.getElementById('confirm-delete-action-btn').addEventListener('click', async () => {
+      if (pendingDeleteAction) {
+        await pendingDeleteAction();
+        pendingDeleteAction = null;
+      }
+      closeDeleteConfirmModal();
+    });
+
+    window.closeDeleteConfirmModal = () => {
+      document.getElementById('delete-confirm-modal').classList.add('hidden');
+      pendingDeleteAction = null;
+    };
+
+    // Single-Like Toggle
     window.toggleLikeCurrentPost = async () => {
       if (!currentUser || !activePostId) return;
 
@@ -772,10 +1167,8 @@
       const uid = currentUser.uid;
 
       if (likedUsers.includes(uid)) {
-        // Unlike
         likedUsers = likedUsers.filter(id => id !== uid);
       } else {
-        // Like
         likedUsers.push(uid);
       }
 
@@ -787,7 +1180,7 @@
       }
     };
 
-    // Comment Submission Logic
+    // Comment Submission
     window.handleCommentSubmit = async (e) => {
       e.preventDefault();
       if (!currentUser || !activePostId) return;
@@ -803,9 +1196,11 @@
       const now = new Date();
       const dateStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
+      const commentAuthor = currentAdminRole ? `👑 ${currentAdminRole}` : '익명 학생';
+
       comments.push({
         id: crypto.randomUUID(),
-        author: '익명 학생',
+        author: commentAuthor,
         text,
         dateStr,
         uid: currentUser.uid
@@ -820,13 +1215,12 @@
       }
     };
 
-    // Close Detail Modal
+    // Close Modals
     window.closeDetailModal = () => {
       document.getElementById('detail-modal').classList.add('hidden');
       activePostId = null;
     };
 
-    // Notice Modal Handler
     window.openNoticeModal = (noticeId) => {
       const notice = defaultNotices.find(n => n.id === noticeId);
       if (!notice) return;
@@ -843,7 +1237,7 @@
       document.getElementById('notice-modal').classList.add('hidden');
     };
 
-    // Submit New Post Form
+    // Submit New Post
     window.handlePostSubmit = async (e) => {
       e.preventDefault();
       if (!currentUser) return;
@@ -854,11 +1248,14 @@
 
       const boardType = document.getElementById('post-board-type').value;
       const title = document.getElementById('post-title').value;
-      const author = document.getElementById('post-author').value || '익명';
+      let author = document.getElementById('post-author').value || '익명';
+      if (currentAdminRole) {
+        author = `👑 ${currentAdminRole}`;
+      }
       const content = document.getElementById('post-content').value;
 
       const now = new Date();
-      const dateStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
 
       try {
         const postsCol = collection(db, 'artifacts', appId, 'public', 'data', 'posts');
@@ -878,6 +1275,7 @@
 
         if (boardType === '질문') switchTab('qna');
         else if (boardType === '동아리') switchTab('club');
+        else if (boardType === '공지') switchTab('notice');
         else switchTab('free');
 
       } catch (err) {
@@ -888,13 +1286,37 @@
       }
     };
 
+    // Admin Modals
+    window.openAdminModal = () => {
+      document.getElementById('admin-login-modal').classList.remove('hidden');
+    };
+
+    window.closeAdminModal = () => {
+      document.getElementById('admin-login-modal').classList.add('hidden');
+      document.getElementById('admin-login-error').classList.add('hidden');
+    };
+
+    window.openAdminDashboard = () => {
+      document.getElementById('dash-admin-name').innerText = currentAdminRole || '관리자';
+      document.getElementById('dash-total-posts').innerText = allPosts.length;
+
+      const totalComments = allPosts.reduce((acc, p) => acc + (p.comments || []).length, 0);
+      document.getElementById('dash-total-comments').innerText = totalComments;
+
+      document.getElementById('admin-dashboard-modal').classList.remove('hidden');
+    };
+
+    window.closeAdminDashboard = () => {
+      document.getElementById('admin-dashboard-modal').classList.add('hidden');
+    };
+
     function escapeHtml(str) {
       if (!str) return '';
       return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
   </script>
 
-  <!-- UI Switching Functions -->
+  <!-- Navigation Functions -->
   <script>
     function switchTab(tabName) {
       const tabs = ['home', 'notice', 'free', 'qna', 'club', 'calendar', 'meal'];
