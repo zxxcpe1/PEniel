@@ -1,1 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>학교 전체 게시판</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    /* 상단 헤더 영역 */
+    .board-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #111;
+      padding-bottom: 16px;
+    }
+    .board-title {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .header-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    .btn {
+      padding: 10px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-home {
+      background-color: #6c757d;
+      color: white;
+    }
+    .btn-home:hover {
+      background-color: #5a6268;
+    }
+    .btn-write {
+      background-color: #007bff;
+      color: white;
+    }
+    .btn-write:hover {
+      background-color: #0056b3;
+    }
+
+    /* 게시판 테이블 영역 */
+    .board-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .board-table th, .board-table td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #eee;
+    }
+    .board-table th {
+      background-color: #f1f3f5;
+      font-weight: 600;
+      color: #495057;
+    }
+    .board-table tr:hover {
+      background-color: #f8f9fa;
+    }
+    .title-col {
+      width: 50%;
+    }
+    .title-col a {
+      color: #212529;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .title-col a:hover {
+      text-decoration: underline;
+      color: #007bff;
+    }
+    .notice {
+      background-color: #fff9db;
+    }
+    .badge {
+      background-color: #ff6b6b;
+      color: white;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-right: 6px;
+    }
+
+    /* 페이지네이션 */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 24px;
+    }
+    .pagination a {
+      padding: 6px 12px;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      color: #495057;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .pagination a.active {
+      background-color: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 헤더: 타이틀 및 버튼 -->
+    <div class="board-header">
+      <h1 class="board-title">전체 게시판</h1>
+      <div class="header-buttons">
+        <!-- 메인 페이지로 돌아가는 버튼 (상대 경로) -->
+        <a href="../" class="btn btn-home">메인으로</a>
+        <a href="#" class="btn btn-write" onclick="alert('글쓰기 페이지 연결 필요'); return false;">글쓰기</a>
+      </div>
+    </div>
+
+    <!-- 게시글 목록 -->
+    <table class="board-table">
+      <thead>
+        <tr>
+          <th style="width: 10%;">번호</th>
+          <th class="title-col">제목</th>
+          <th style="width: 15%;">작성자</th>
+          <th style="width: 15%;">작성일</th>
+          <th style="width: 10%;">조회수</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- 공지사항 -->
+        <tr class="notice">
+          <td>공지</td>
+          <td class="title-col">
+            <span class="badge">필독</span>
+            <a href="#" onclick="alert('글 상세 페이지 연결 필요'); return false;">학교 게시판 이용 수칙 안내</a>
+          </td>
+          <td>관리자</td>
+          <td>2026.08.20</td>
+          <td>142</td>
+        </tr>
+        <!-- 일반 게시글 예시 -->
+        <tr>
+          <td>3</td>
+          <td class="title-col">
+            <a href="#" onclick="alert('글 상세 페이지 연결 필요'); return false;">다음 주 동아리 활동 일정 공지</a>
+          </td>
+          <td>학생회</td>
+          <td>2026.08.19</td>
+          <td>45</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td class="title-col">
+            <a href="#" onclick="alert('글 상세 페이지 연결 필요'); return false;">정독실 이용 관련 건의사항</a>
+          </td>
+          <td>강우현</td>
+          <td>2026.08.18</td>
+          <td>28</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td class="title-col">
+            <a href="#" onclick="alert('글 상세 페이지 연결 필요'); return false;">게시판 오픈 테스트 글입니다.</a>
+          </td>
+          <td>홍길동</td>
+          <td>2026.08.17</td>
+          <td>12</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 하단 페이지 번호 -->
+    <div class="pagination">
+      <a href="#" class="active">1</a>
+      <a href="#">2</a>
+      <a href="#">3</a>
+    </div>
+  </div>
+
+</body>
+</html>
 
