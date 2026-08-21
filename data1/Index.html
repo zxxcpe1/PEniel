@@ -1,1 +1,49 @@
+<!-- index.html 파일 내부 -->
 
+<!-- 1. 먼저 데이터 파일 불러오기 -->
+<script src="scheduleData.js"></script>
+
+<!-- 2. 그 다음 화면에 보여주는 기능 코드 넣기 -->
+<script>
+  function updateMonthOptions() {
+    const semester = document.getElementById("semesterSelect").value;
+    const monthSelect = document.getElementById("monthSelect");
+    monthSelect.innerHTML = "";
+
+    const months = Object.keys(scheduleData[semester]);
+    months.forEach(month => {
+      const option = document.createElement("option");
+      option.value = month;
+      option.textContent = month;
+      monthSelect.appendChild(option);
+    });
+
+    renderSchedule();
+  }
+
+  function renderSchedule() {
+    const semester = document.getElementById("semesterSelect").value;
+    const month = document.getElementById("monthSelect").value;
+    const scheduleList = document.getElementById("scheduleList");
+    
+    scheduleList.innerHTML = "";
+    const events = scheduleData[semester][month] || [];
+
+    if (events.length === 0) {
+      scheduleList.innerHTML = "<div class='schedule-item'>등록된 주요 일정이 없습니다.</div>";
+      return;
+    }
+
+    events.forEach(item => {
+      const row = document.createElement("div");
+      row.className = "schedule-item";
+      row.innerHTML = `
+        <span class="schedule-date">${item.date}</span>
+        <span class="schedule-event ${item.highlight ? 'highlight-event' : ''}">${item.event}</span>
+      `;
+      scheduleList.appendChild(row);
+    });
+  }
+
+  updateMonthOptions();
+</script>
