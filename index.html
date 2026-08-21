@@ -3,262 +3,384 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>브니엘고등학교 커뮤니티</title>
+  <title>브니엘고등학교 학생 스페이스</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Firebase JS SDK -->
-  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js" type="module"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js" type="module"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js" type="module"></script>
 
   <style>
     @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
     * { font-family: 'Pretendard', sans-serif; }
+    
+    /* Neon & Visual Highlights */
+    .bg-grid-pattern {
+      background-size: 30px 30px;
+      background-image: linear-gradient(to right, rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+    }
+    .neon-border {
+      box-shadow: 0 0 15px rgba(129, 140, 248, 0.25);
+    }
     .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
+      width: 5px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
       background: #f1f5f9;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 3px;
+      background: #a5b4fc;
+      border-radius: 4px;
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col bg-grid-pattern antialiased">
+
+  <!-- Top Announcement Ticker Bar -->
+  <div class="bg-gradient-to-r from-amber-500 via-rose-500 to-indigo-600 text-white text-xs font-extrabold py-2 px-4 shadow-lg flex items-center justify-between">
+    <div class="max-w-6xl mx-auto w-full flex items-center justify-between">
+      <div class="flex items-center gap-2 overflow-hidden">
+        <span class="bg-black/30 text-amber-200 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse shrink-0">🔥 HOT NOTICE</span>
+        <p class="truncate text-xs font-bold text-white">2학기 중간고사 D-32! 도서관 야간 자습실 좌석 확장 안내 및 브니엘 축제 부스 모집 중</p>
+      </div>
+      <button onclick="switchTab('notice')" class="hidden md:block shrink-0 bg-white/20 hover:bg-white/30 text-white px-2.5 py-0.5 rounded text-[11px] transition">
+        공지 전체보기 →
+      </button>
+    </div>
+  </div>
+
+  <!-- Admin Active Top Banner -->
+  <div id="admin-top-banner" class="hidden bg-amber-400 text-slate-950 text-xs font-extrabold py-2 px-4 shadow-inner text-center flex items-center justify-center gap-2">
+    <i data-lucide="shield-alert" class="w-4 h-4"></i>
+    <span>현재 관리자 권한으로 접속 중입니다. (게시글/댓글 원클릭 경고 삭제 및 공지사항 등록 가능)</span>
+  </div>
 
   <!-- Header / Navigation -->
-  <header class="sticky top-0 z-40 bg-indigo-900 text-white shadow-md">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-indigo-500/20 shadow-2xl">
+    <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
       <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
-        <div class="w-10 h-10 bg-amber-400 rounded-full flex items-center justify-center font-bold text-indigo-950 text-xl shadow">
+        <div class="w-10 h-10 bg-gradient-to-tr from-amber-400 to-indigo-500 rounded-xl flex items-center justify-center font-black text-slate-950 text-xl shadow-lg ring-2 ring-indigo-400/50">
           P
         </div>
         <div>
-          <h1 class="font-bold text-lg leading-tight">브니엘고등학교</h1>
-          <p class="text-xs text-indigo-200">Peniel High School Community</p>
+          <div class="flex items-center gap-2">
+            <h1 class="font-black text-lg text-white leading-tight tracking-tight">브니엘고</h1>
+            <span class="bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 text-[10px] px-1.5 py-0.2 rounded font-bold">STUDENTS</span>
+          </div>
+          <p class="text-[11px] text-indigo-300/80">Peniel High School Space</p>
         </div>
       </div>
 
-      <!-- Desktop Nav -->
-      <nav class="hidden md:flex space-x-1">
-        <button onclick="switchTab('home')" id="nav-home" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-indigo-800 flex items-center gap-1.5 active-nav">
-          <i data-lucide="home" class="w-4 h-4"></i> 홈
+      <!-- Desktop Navigation Links -->
+      <nav class="hidden lg:flex items-center space-x-1 bg-slate-800/80 p-1 rounded-2xl border border-slate-700/60">
+        <button onclick="switchTab('home')" id="nav-home" class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 text-amber-400 bg-indigo-900/60 border border-indigo-500/40 shadow">
+          <i data-lucide="sparkles" class="w-4 h-4"></i> 피드
         </button>
-        <button onclick="switchTab('notice')" id="nav-notice" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-indigo-800 flex items-center gap-1.5">
-          <i data-lucide="bell" class="w-4 h-4"></i> 공지사항
-        </button>
-        <button onclick="switchTab('free')" id="nav-free" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-indigo-800 flex items-center gap-1.5">
+        <button onclick="switchTab('free')" id="nav-free" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-700/50">
           <i data-lucide="message-square" class="w-4 h-4"></i> 자유게시판
         </button>
-        <button onclick="switchTab('qna')" id="nav-qna" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-indigo-800 flex items-center gap-1.5">
+        <button onclick="switchTab('teachers')" id="nav-teachers" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-700/50">
+          <i data-lucide="heart" class="w-4 h-4 text-rose-400"></i> 선생님 칭찬
+        </button>
+        <button onclick="switchTab('spaces')" id="nav-spaces" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-700/50">
+          <i data-lucide="map-pin" class="w-4 h-4 text-emerald-400"></i> 브니엘 공간
+        </button>
+        <button onclick="switchTab('qna')" id="nav-qna" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-700/50">
           <i data-lucide="help-circle" class="w-4 h-4"></i> Q&A
         </button>
-        <button onclick="switchTab('club')" id="nav-club" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-indigo-800 flex items-center gap-1.5">
-          <i data-lucide="users" class="w-4 h-4"></i> 동아리/학생회
+        <button onclick="switchTab('calendar')" id="nav-calendar" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-700/50">
+          <i data-lucide="calendar" class="w-4 h-4"></i> 학사달력
         </button>
-        <button onclick="switchTab('calendar')" id="nav-calendar" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-indigo-800 flex items-center gap-1.5">
-          <i data-lucide="calendar" class="w-4 h-4"></i> 학사일정
-        </button>
-        <button onclick="switchTab('meal')" id="nav-meal" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-indigo-800 flex items-center gap-1.5">
-          <i data-lucide="utensils" class="w-4 h-4"></i> 급식
+        <button onclick="switchTab('meal')" id="nav-meal" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-700/50">
+          <i data-lucide="utensils" class="w-4 h-4 text-amber-400"></i> 급식
         </button>
       </nav>
 
-      <!-- User & Admin Status Badge -->
+      <!-- User Auth Status & Admin Control -->
       <div class="flex items-center gap-2">
+        <!-- Admin Badge (Shown when Admin Logged in) -->
         <div id="admin-indicator" class="hidden flex items-center gap-2">
-          <button onclick="openAdminDashboard()" class="bg-amber-400 hover:bg-amber-300 text-indigo-950 font-bold text-xs px-3 py-1.5 rounded-full flex items-center gap-1 shadow">
-            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> <span id="admin-name-tag">관리자</span>
+          <button onclick="openAdminDashboard()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-lg">
+            <i data-lucide="shield-check" class="w-4 h-4"></i> <span id="admin-name-tag">관리자</span>
           </button>
-          <button onclick="logoutAdmin()" class="bg-indigo-800 text-indigo-200 hover:text-white text-xs px-2.5 py-1.5 rounded-lg">
+          <button onclick="logoutAdmin()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold px-2.5 py-2 rounded-xl border border-slate-700">
             로그아웃
           </button>
         </div>
 
-        <button id="admin-login-btn" onclick="openAdminModal()" class="text-xs bg-indigo-800 border border-indigo-700 hover:bg-indigo-700 px-3 py-1.5 rounded-full flex items-center gap-1 text-indigo-100 transition">
-          <i data-lucide="lock" class="w-3.5 h-3.5"></i> 관리자 로그인
-        </button>
+        <!-- Student Login / Admin Login Button -->
+        <div id="user-status-guest" class="flex items-center gap-2">
+          <button onclick="openLoginModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3.5 py-2 rounded-xl shadow-lg transition border border-indigo-400/30 flex items-center gap-1.5">
+            <i data-lucide="log-in" class="w-3.5 h-3.5"></i> 로그인 / 프로필
+          </button>
+          <button id="admin-login-btn" onclick="openAdminModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-1 transition">
+            <i data-lucide="lock" class="w-3.5 h-3.5 text-amber-400"></i> 관리자
+          </button>
+        </div>
+
+        <!-- Logged In Member Badge -->
+        <div id="user-status-member" class="hidden flex items-center gap-2">
+          <button onclick="switchTab('mypage')" class="bg-gradient-to-r from-indigo-900 to-slate-800 border border-indigo-500/50 text-amber-300 hover:text-white px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow">
+            <i data-lucide="user-check" class="w-4 h-4 text-emerald-400"></i>
+            <span id="user-profile-name">2학년 3반 홍길동</span>
+          </button>
+          <button onclick="logoutMember()" class="text-xs bg-slate-800 text-slate-400 hover:text-slate-200 px-2.5 py-1.5 rounded-lg border border-slate-700">
+            로그아웃
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- Mobile Nav Bar -->
-    <div class="md:hidden flex justify-around border-t border-indigo-800 py-2 bg-indigo-950 text-[11px] text-indigo-200 overflow-x-auto">
-      <button onclick="switchTab('home')" class="flex flex-col items-center gap-1 py-1 px-2.5 shrink-0">
-        <i data-lucide="home" class="w-4 h-4"></i> 홈
+    <!-- Mobile Sub Navigation Bar -->
+    <div class="lg:hidden flex justify-around border-t border-slate-800 py-2 bg-slate-950/90 text-[11px] text-slate-300 overflow-x-auto">
+      <button onclick="switchTab('home')" class="flex flex-col items-center gap-1 py-1 px-3 shrink-0">
+        <i data-lucide="sparkles" class="w-4 h-4 text-amber-400"></i> 홈
       </button>
-      <button onclick="switchTab('notice')" class="flex flex-col items-center gap-1 py-1 px-2.5 shrink-0">
-        <i data-lucide="bell" class="w-4 h-4"></i> 공지
-      </button>
-      <button onclick="switchTab('free')" class="flex flex-col items-center gap-1 py-1 px-2.5 shrink-0">
+      <button onclick="switchTab('free')" class="flex flex-col items-center gap-1 py-1 px-3 shrink-0">
         <i data-lucide="message-square" class="w-4 h-4"></i> 자유
       </button>
-      <button onclick="switchTab('qna')" class="flex flex-col items-center gap-1 py-1 px-2.5 shrink-0">
+      <button onclick="switchTab('teachers')" class="flex flex-col items-center gap-1 py-1 px-3 shrink-0">
+        <i data-lucide="heart" class="w-4 h-4 text-rose-400"></i> 스승
+      </button>
+      <button onclick="switchTab('spaces')" class="flex flex-col items-center gap-1 py-1 px-3 shrink-0">
+        <i data-lucide="map-pin" class="w-4 h-4 text-emerald-400"></i> 공간
+      </button>
+      <button onclick="switchTab('qna')" class="flex flex-col items-center gap-1 py-1 px-3 shrink-0">
         <i data-lucide="help-circle" class="w-4 h-4"></i> Q&A
       </button>
-      <button onclick="switchTab('club')" class="flex flex-col items-center gap-1 py-1 px-2.5 shrink-0">
-        <i data-lucide="users" class="w-4 h-4"></i> 동아리
-      </button>
-      <button onclick="switchTab('calendar')" class="flex flex-col items-center gap-1 py-1 px-2.5 shrink-0">
+      <button onclick="switchTab('calendar')" class="flex flex-col items-center gap-1 py-1 px-3 shrink-0">
         <i data-lucide="calendar" class="w-4 h-4"></i> 일정
       </button>
-      <button onclick="switchTab('meal')" class="flex flex-col items-center gap-1 py-1 px-2.5 shrink-0">
-        <i data-lucide="utensils" class="w-4 h-4"></i> 급식
+      <button onclick="switchTab('meal')" class="flex flex-col items-center gap-1 py-1 px-3 shrink-0">
+        <i data-lucide="utensils" class="w-4 h-4 text-amber-400"></i> 급식
       </button>
     </div>
   </header>
 
-  <!-- Admin Bar Banner -->
-  <div id="admin-top-banner" class="hidden bg-amber-500 text-indigo-950 text-xs font-bold py-2 px-4 shadow-inner text-center flex items-center justify-center gap-2">
-    <i data-lucide="shield-alert" class="w-4 h-4"></i>
-    <span>현재 관리자 권한으로 로그인 중입니다. (삭제 확인 절차 후 즉시 삭제 처리됩니다)</span>
-  </div>
-
   <!-- Main Container -->
-  <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6">
+  <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 space-y-8">
 
     <!-- Tab 1: HOME PAGE -->
-    <section id="tab-home" class="space-y-6">
-      <!-- Hero Banner -->
-      <div class="relative rounded-2xl bg-gradient-to-r from-indigo-900 via-indigo-800 to-indigo-950 text-white p-6 md:p-8 shadow-xl overflow-hidden">
-        <div class="absolute right-0 top-0 bottom-0 opacity-10 flex items-center pointer-events-none">
-          <i data-lucide="school" class="w-96 h-96 -mr-16"></i>
+    <section id="tab-home" class="space-y-8">
+      
+      <!-- Visual Hero Section -->
+      <div class="relative rounded-3xl bg-gradient-to-r from-indigo-950 via-slate-900 to-indigo-900 border border-indigo-500/30 p-6 md:p-10 shadow-2xl overflow-hidden neon-border">
+        <div class="absolute -right-10 -bottom-10 opacity-20 pointer-events-none">
+          <i data-lucide="zap" class="w-96 h-96 text-indigo-400"></i>
         </div>
-        <div class="relative z-10 max-w-xl">
-          <span class="bg-amber-400 text-indigo-950 font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wide">Peniel High School</span>
-          <h2 class="text-2xl md:text-4xl font-extrabold mt-3 mb-2 leading-tight">브니엘고등학교 소통 공간입니다!</h2>
-          <p class="text-indigo-200 text-sm md:text-base">공지사항, 자유게시판, Q&A, 동아리 소식부터 달력 학사일정과 급식표까지 한곳에서 확인하세요.</p>
-          <div class="mt-6 flex flex-wrap gap-3">
-            <button onclick="openPostModal('자유')" class="bg-amber-400 hover:bg-amber-300 text-indigo-950 font-bold px-4 py-2.5 rounded-xl shadow text-sm transition flex items-center gap-2">
-              <i data-lucide="pen-tool" class="w-4 h-4"></i> 자유게시물 쓰기
+        <div class="relative z-10 max-w-2xl space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="bg-amber-400 text-slate-950 font-black text-[11px] px-3 py-1 rounded-full uppercase tracking-wider shadow">REAL PENIEL LIFE</span>
+            <span class="text-xs text-indigo-300 border border-indigo-400/30 px-2.5 py-0.5 rounded-full">자유로운 우리들의 소통 구역</span>
+          </div>
+          <h2 class="text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">
+            딱딱한 학교 사이트는 그만.<br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-indigo-300 to-rose-400">브니엘고 학생들만의 비밀 소통 구역!</span>
+          </h2>
+          <p class="text-slate-300 text-xs md:text-sm leading-relaxed">
+            익명으로 솔직하게 고민을 나누고, 선생님께 감사의 마음을 전하며, 맛있는 급식 별점 평점부터 숨겨진 학교 쉼터 위치까지 공유하세요.
+          </p>
+
+          <div class="pt-2 flex flex-wrap gap-3">
+            <button onclick="openPostModal('자유')" class="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-extrabold px-5 py-3 rounded-2xl shadow-xl text-xs transition flex items-center gap-2">
+              <i data-lucide="edit-3" class="w-4 h-4"></i> 익명 토론 글쓰기
             </button>
-            <button onclick="switchTab('meal')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 font-medium px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2">
-              <i data-lucide="utensils" class="w-4 h-4"></i> 오늘 급식 보기
+            <button onclick="switchTab('spaces')" class="bg-slate-800/80 hover:bg-slate-700/80 text-indigo-200 border border-indigo-500/30 font-bold px-4 py-3 rounded-2xl text-xs transition flex items-center gap-2">
+              <i data-lucide="compass" class="w-4 h-4 text-emerald-400"></i> 브니엘 비밀공간 지도
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Dashboard Grid -->
+      <!-- Main Highlights Grid -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        <!-- Left 2 Columns -->
+        <!-- Column 1 & 2: Feeds & Realtime Talk -->
         <div class="md:col-span-2 space-y-6">
-          <!-- Recent Notices -->
-          <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
-                <i data-lucide="megaphone" class="w-5 h-5 text-indigo-600"></i> 주요 공지사항
+          
+          <!-- HOT 자유게시글 랭킹 -->
+          <div class="bg-slate-800/60 border border-slate-700/80 rounded-3xl p-6 shadow-xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+              <h3 class="font-extrabold text-base text-white flex items-center gap-2">
+                <i data-lucide="flame" class="w-5 h-5 text-rose-500"></i> 실시간 브니엘 핫 토크
               </h3>
-              <button onclick="switchTab('notice')" class="text-xs text-indigo-600 font-medium hover:underline flex items-center gap-1">
-                더보기 <i data-lucide="chevron-right" class="w-3 h-3"></i>
+              <button onclick="switchTab('free')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-1">
+                게시판 바로가기 →
               </button>
             </div>
-            <div id="home-notice-list" class="space-y-2"></div>
+            
+            <div id="home-free-feed" class="space-y-3">
+              <!-- Dynamically Populated -->
+            </div>
           </div>
 
-          <!-- Free Board Recent Posts -->
-          <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
-                <i data-lucide="message-circle" class="w-5 h-5 text-indigo-600"></i> 자유게시판 최신글
+          <!-- 선생님 칭찬 & 감사의 글 미리보기 -->
+          <div class="bg-slate-800/60 border border-slate-700/80 rounded-3xl p-6 shadow-xl space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+              <h3 class="font-extrabold text-base text-white flex items-center gap-2">
+                <i data-lucide="heart" class="w-5 h-5 text-rose-400"></i> 선생님 감동 칭찬 한마디
               </h3>
-              <button onclick="switchTab('free')" class="text-xs text-indigo-600 font-medium hover:underline flex items-center gap-1">
-                전체보기 <i data-lucide="chevron-right" class="w-3 h-3"></i>
+              <button onclick="switchTab('teachers')" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold">
+                칭찬전당 보기 →
               </button>
             </div>
-            <div id="home-free-list" class="space-y-2"></div>
+            <div id="home-teacher-feed" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <!-- Dynamically Populated -->
+            </div>
           </div>
+
         </div>
 
-        <!-- Right 1 Column -->
+        <!-- Column 3: Meal, Space, Admin Notice Cards -->
         <div class="space-y-6">
-          <!-- Today's Lunch Card -->
-          <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+          
+          <!-- Today Meal Card -->
+          <div class="bg-gradient-to-br from-amber-500 via-orange-600 to-rose-600 rounded-3xl p-6 text-white shadow-2xl relative overflow-hidden">
             <div class="flex items-center justify-between mb-3">
-              <span class="bg-black/20 text-white text-xs px-2.5 py-1 rounded-full font-medium">오늘의 점심</span>
-              <span class="text-xs text-amber-100">2026.08.20</span>
+              <span class="bg-black/30 backdrop-blur-md text-amber-200 text-xs px-3 py-1 rounded-full font-bold">오늘의 점심</span>
+              <span class="text-xs text-amber-100 font-semibold">2026.08.21 (금)</span>
             </div>
-            <h4 class="font-bold text-xl mb-3">맛있는 점심 메뉴</h4>
-            <ul class="text-sm space-y-1 text-amber-50 mb-4 list-disc list-inside">
-              <li>친환경 쌀밥</li>
-              <li>등심 돈가스 & 브라운소스</li>
-              <li>해물 순두부찌개</li>
-              <li>마카로니 콘샐러드</li>
-              <li>배추김치 & 에이드</li>
+            <h4 class="font-black text-xl mb-3">수제 등심돈가스 & 순두부</h4>
+            <ul class="text-xs space-y-1.5 text-amber-50 mb-5 list-disc list-inside bg-black/10 p-3 rounded-2xl border border-white/10">
+              <li>친환경 칼슘쌀밥</li>
+              <li>수제 등심돈가스 & 브라운소스</li>
+              <li>해물 얼큰 순두부찌개</li>
+              <li>콘마카로니 샐러드</li>
+              <li>상큼 청포도 에이드</li>
             </ul>
-            <button onclick="switchTab('meal')" class="w-full bg-white text-orange-600 font-bold py-2 rounded-xl text-xs shadow hover:bg-amber-50 transition text-center block">
-              전체 급식표 및 평가
-            </button>
+            
+            <div class="flex items-center justify-between bg-white text-slate-900 p-3 rounded-2xl shadow-md">
+              <div>
+                <span class="text-[10px] text-slate-500 block font-bold">학생 급식 만족도</span>
+                <span class="text-lg font-black text-amber-600">★ 4.9 <span class="text-xs font-normal text-slate-400">(42명 참여)</span></span>
+              </div>
+              <button onclick="switchTab('meal')" class="bg-slate-900 text-white font-bold text-xs px-3.5 py-2 rounded-xl hover:bg-slate-800 transition">
+                평가 참여
+              </button>
+            </div>
           </div>
 
-          <!-- Academic Calendar / D-Day Quick View -->
-          <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+          <!-- School Spaces Banner -->
+          <div onclick="switchTab('spaces')" class="bg-gradient-to-r from-emerald-900/80 to-slate-800 border border-emerald-500/30 p-5 rounded-3xl shadow-xl cursor-pointer hover:border-emerald-400/60 transition group">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-extrabold text-emerald-400 flex items-center gap-1">
+                <i data-lucide="map-pin" class="w-4 h-4"></i> 브니엘 명당 대동여지도
+              </span>
+              <i data-lucide="arrow-right" class="w-4 h-4 text-emerald-400 group-hover:translate-x-1 transition"></i>
+            </div>
+            <h4 class="text-sm font-bold text-white">시험기간 명당 자습실 & 매점 신상 과자 꿀팁</h4>
+            <p class="text-xs text-slate-400 mt-1">우리학교 선배들이 검증한 아지트 위치 확인하기</p>
+          </div>
+
+          <!-- Important Academic Notice Quick-Card -->
+          <div class="bg-slate-800/60 border border-slate-700/80 rounded-3xl p-5 shadow-xl">
             <div class="flex items-center justify-between mb-3">
-              <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                <i data-lucide="calendar" class="w-4 h-4 text-indigo-600"></i> 주요 D-Day
-              </h3>
-              <button onclick="switchTab('calendar')" class="text-xs text-indigo-600 font-medium hover:underline">전체일정</button>
+              <h4 class="text-xs font-extrabold text-indigo-300 flex items-center gap-1.5">
+                <i data-lucide="bell" class="w-4 h-4 text-amber-400"></i> 꼭 읽어야 할 중요 공지
+              </h4>
+              <button onclick="switchTab('notice')" class="text-[11px] text-slate-400 hover:text-white">전체보기</button>
             </div>
-            <div class="space-y-2">
-              <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs">
-                <span class="font-medium text-slate-700">2학기 중간고사</span>
-                <span class="bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded-full">D-32</span>
-              </div>
-              <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs">
-                <span class="font-medium text-slate-700">브니엘 축제</span>
-                <span class="bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">D-58</span>
-              </div>
+            <div id="home-notice-snippet" class="space-y-2">
+              <!-- Dynamically Populated -->
             </div>
           </div>
+
         </div>
 
       </div>
+
     </section>
 
-    <!-- Tab 2: NOTICE PAGE -->
-    <section id="tab-notice" class="hidden space-y-6">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-        <div>
-          <h2 class="text-xl font-bold text-slate-800">학교 공지사항</h2>
-          <p class="text-xs text-slate-500">브니엘고등학교의 중요 소식 및 가정통신문입니다.</p>
-        </div>
-        <button id="admin-notice-btn" onclick="openPostModal('공지')" class="hidden bg-amber-500 hover:bg-amber-600 text-indigo-950 font-bold px-4 py-2.5 rounded-xl shadow text-xs transition flex items-center justify-center gap-2">
-          <i data-lucide="plus-circle" class="w-4 h-4"></i> 관리자 공지 작성
-        </button>
-      </div>
-
-      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
-        <div class="divide-y divide-slate-100" id="notice-full-list"></div>
-      </div>
-    </section>
-
-    <!-- Tab 3: FREE BOARD PAGE -->
+    <!-- Tab 2: FREE BOARD PAGE -->
     <section id="tab-free" class="hidden space-y-6">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-800/60 border border-slate-700/80 p-6 rounded-3xl shadow-xl">
         <div>
-          <h2 class="text-xl font-bold text-slate-800">자유 게시판</h2>
-          <p class="text-xs text-slate-500">브니엘고 학생들의 자유로운 소통 공간입니다.</p>
+          <div class="flex items-center gap-2">
+            <h2 class="text-xl font-extrabold text-white">자유 게시판</h2>
+            <span class="bg-indigo-500/20 text-indigo-300 text-xs px-2.5 py-0.5 rounded-full font-bold border border-indigo-400/30">100% 익명 보장</span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">브니엘고 학생들의 자유로운 의견, 솔직한 학업 고민, 일상 잡담을 남겨보세요.</p>
         </div>
-        <button onclick="openPostModal('자유')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl shadow text-xs transition flex items-center justify-center gap-2">
-          <i data-lucide="square-pen" class="w-4 h-4"></i> 글 작성하기
+        <button onclick="openPostModal('자유')" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold px-5 py-3 rounded-2xl shadow-lg text-xs transition flex items-center justify-center gap-2">
+          <i data-lucide="pen-tool" class="w-4 h-4"></i> 글 작성하기
         </button>
       </div>
 
       <div id="posts-container-free" class="space-y-4"></div>
     </section>
 
-    <!-- Tab 4: Q&A BOARD PAGE -->
-    <section id="tab-qna" class="hidden space-y-6">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-        <div>
-          <h2 class="text-xl font-bold text-slate-800">Q&A 질문답변</h2>
-          <p class="text-xs text-slate-500">학업, 진로, 학교생활 중 궁금한 점을 질문하고 답변을 나누세요!</p>
+    <!-- Tab 3: TEACHERS PRAISE PAGE -->
+    <section id="tab-teachers" class="hidden space-y-6">
+      <div class="bg-gradient-to-r from-rose-950/80 via-slate-900 to-slate-900 border border-rose-500/30 p-6 rounded-3xl shadow-xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-extrabold text-white">선생님 존경 & 칭찬의 전당</h2>
+              <span class="bg-rose-500/20 text-rose-300 text-xs px-2.5 py-0.5 rounded-full font-bold border border-rose-400/30">클린 칭찬존</span>
+            </div>
+            <p class="text-xs text-slate-300 mt-1">열정적인 수업과 친절한 상담으로 힘이 되어주시는 브니엘고 선생님들께 감사의 메시지를 전달하세요!</p>
+          </div>
+          <button onclick="openPostModal('선생님칭찬')" class="bg-rose-500 hover:bg-rose-400 text-white font-extrabold px-5 py-3 rounded-2xl shadow-lg text-xs transition flex items-center justify-center gap-2">
+            <i data-lucide="heart" class="w-4 h-4"></i> 선생님 칭찬글 쓰기
+          </button>
         </div>
-        <button onclick="openPostModal('질문')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl shadow text-xs transition flex items-center justify-center gap-2">
+        
+        <div class="mt-4 bg-slate-900/60 p-3.5 rounded-2xl border border-rose-500/20 text-xs text-rose-200/80 flex items-center gap-2">
+          <i data-lucide="shield-check" class="w-4 h-4 text-rose-400 shrink-0"></i>
+          <span>본 공간은 긍정적이고 따뜻한 존경의 문화 조성을 위해 악의적인 비방이나 흠집내기 글은 자동 필터링 됩니다.</span>
+        </div>
+      </div>
+
+      <div id="posts-container-teachers" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <!-- Tab 4: SPACES PAGE -->
+    <section id="tab-spaces" class="hidden space-y-6">
+      <div class="bg-slate-800/60 border border-slate-700/80 p-6 rounded-3xl shadow-xl">
+        <h2 class="text-xl font-extrabold text-white">브니엘고 공간 가이드 & 비밀 명당</h2>
+        <p class="text-xs text-slate-400 mt-1">학교생활의 질을 높여주는 브니엘고의 핵심 시설과 숨겨진 장소 안내입니다.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="bg-slate-800/80 border border-slate-700 rounded-3xl p-5 shadow-xl space-y-3 hover:border-indigo-500/50 transition">
+          <div class="w-10 h-10 bg-indigo-500/20 text-indigo-400 rounded-2xl flex items-center justify-center font-bold">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+          </div>
+          <span class="bg-indigo-500/20 text-indigo-300 text-[10px] px-2 py-0.5 rounded-full font-bold">본관 2층</span>
+          <h3 class="font-bold text-base text-white">중앙 도서관 & 정독실</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">시험기간 야간 자습 시 최고의 집중력을 자랑하는 곳. 신간 판타지 소설과 최신 잡지도 비치되어 있습니다.</p>
+        </div>
+
+        <div class="bg-slate-800/80 border border-slate-700 rounded-3xl p-5 shadow-xl space-y-3 hover:border-amber-500/50 transition">
+          <div class="w-10 h-10 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center font-bold">
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+          </div>
+          <span class="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full font-bold">체육관 옆</span>
+          <h3 class="font-bold text-base text-white">브니엘 매점 (스낵존)</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">2교시 쉬는시간 빵과 음료수 구매 전쟁이 펼쳐지는 인기 구역! 전자레인지 3대 완비로 따뜻하게 섭취 가능.</p>
+        </div>
+
+        <div class="bg-slate-800/80 border border-slate-700 rounded-3xl p-5 shadow-xl space-y-3 hover:border-emerald-500/50 transition">
+          <div class="w-10 h-10 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center font-bold">
+            <i data-lucide="trees" class="w-5 h-5"></i>
+          </div>
+          <span class="bg-emerald-500/20 text-emerald-300 text-[10px] px-2 py-0.5 rounded-full font-bold">야외 정원</span>
+          <h3 class="font-bold text-base text-white">소나무 숲 산책로 & 벤치</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">점심 식사 후 친구들과 힐링 산책하기 가장 좋은 브니엘고 최고의 뷰포인트 쉼터입니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 5: Q&A PAGE -->
+    <section id="tab-qna" class="hidden space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-800/60 border border-slate-700/80 p-6 rounded-3xl shadow-xl">
+        <div>
+          <h2 class="text-xl font-extrabold text-white">Q&A 질문 답변</h2>
+          <p class="text-xs text-slate-400 mt-1">시험 공부 질문, 진로 고민, 동아리 활동 질문을 자유롭게 물어보세요.</p>
+        </div>
+        <button onclick="openPostModal('질문')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold px-5 py-3 rounded-2xl shadow-lg text-xs transition flex items-center justify-center gap-2">
           <i data-lucide="help-circle" class="w-4 h-4"></i> 질문 등록하기
         </button>
       </div>
@@ -266,229 +388,311 @@
       <div id="posts-container-qna" class="space-y-4"></div>
     </section>
 
-    <!-- Tab 5: CLUB / STUDENT COUNCIL PAGE -->
-    <section id="tab-club" class="hidden space-y-6">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-        <div>
-          <h2 class="text-xl font-bold text-slate-800">동아리 & 학생회 게시판</h2>
-          <p class="text-xs text-slate-500">동아리 모집, 학생회 공지 및 활동 소식을 공유하는 공간입니다.</p>
-        </div>
-        <button onclick="openPostModal('동아리')" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl shadow text-xs transition flex items-center justify-center gap-2">
-          <i data-lucide="users" class="w-4 h-4"></i> 활동글 등록
-        </button>
-      </div>
-
-      <div id="posts-container-club" class="space-y-4"></div>
-    </section>
-
-    <!-- Tab 6: ACADEMIC CALENDAR & INTERACTIVE CALENDAR PAGE -->
+    <!-- Tab 6: CALENDAR PAGE -->
     <section id="tab-calendar" class="hidden space-y-6">
-      <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="bg-slate-800/60 border border-slate-700/80 p-6 rounded-3xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
-          <h2 class="text-xl font-bold text-slate-800 mb-1">2026학년도 브니엘고 학사일정 달력</h2>
-          <p class="text-xs text-slate-500">달력에서 월별 학교 일정과 주요 시험 및 행사를 확인하세요.</p>
+          <h2 class="text-xl font-extrabold text-white">2026학년도 브니엘고 학사일정</h2>
+          <p class="text-xs text-slate-400 mt-1">중간고사, 기말고사, 축제, 방학 일정을 달력으로 확인하세요.</p>
         </div>
-        <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
-          <button onclick="changeCalendarMonth(-1)" class="p-2 hover:bg-white rounded-lg transition text-slate-600">
+        <div class="flex items-center gap-2 bg-slate-900 p-1.5 rounded-2xl border border-slate-700">
+          <button onclick="changeCalendarMonth(-1)" class="p-2 hover:bg-slate-800 rounded-xl transition text-slate-300">
             <i data-lucide="chevron-left" class="w-4 h-4"></i>
           </button>
-          <span id="calendar-month-title" class="text-sm font-bold px-3 text-indigo-950">2026년 8월</span>
-          <button onclick="changeCalendarMonth(1)" class="p-2 hover:bg-white rounded-lg transition text-slate-600">
+          <span id="calendar-month-title" class="text-sm font-extrabold px-3 text-amber-400">2026년 8월</span>
+          <button onclick="changeCalendarMonth(1)" class="p-2 hover:bg-slate-800 rounded-xl transition text-slate-300">
             <i data-lucide="chevron-right" class="w-4 h-4"></i>
           </button>
         </div>
       </div>
 
-      <!-- Calendar Grid View -->
-      <div class="bg-white rounded-2xl p-4 md:p-6 border border-slate-100 shadow-sm overflow-x-auto">
+      <div class="bg-slate-800/60 border border-slate-700/80 rounded-3xl p-6 shadow-xl overflow-x-auto">
         <div class="min-w-[600px]">
-          <!-- Weekday Header -->
-          <div class="grid grid-cols-7 text-center font-bold text-xs text-slate-400 border-b border-slate-100 pb-3 mb-2">
-            <span class="text-rose-500">일</span>
+          <div class="grid grid-cols-7 text-center font-bold text-xs text-slate-400 border-b border-slate-700/60 pb-3 mb-2">
+            <span class="text-rose-400">일</span>
             <span>월</span>
             <span>화</span>
             <span>수</span>
             <span>목</span>
             <span>금</span>
-            <span class="text-indigo-600">토</span>
+            <span class="text-indigo-400">토</span>
           </div>
-
-          <!-- Calendar Days Grid -->
-          <div id="calendar-grid" class="grid grid-cols-7 gap-1 md:gap-2">
-            <!-- Dynamically Rendered Calendar Days -->
-          </div>
+          <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
         </div>
       </div>
+    </section>
 
-      <!-- Full Academic Schedule List -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-          <h3 class="font-bold text-indigo-900 border-b pb-2 mb-3 flex items-center gap-2">
-            <i data-lucide="calendar-days" class="w-4 h-4 text-indigo-600"></i> 2학기 주요 일정 (8월~10월)
-          </h3>
-          <ul class="space-y-2.5 text-xs">
-            <li class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
-              <span class="font-semibold text-slate-700">8월 18일 (월)</span>
-              <span class="text-slate-600">2학기 개학식</span>
-            </li>
-            <li class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
-              <span class="font-semibold text-slate-700">9월 03일 (목)</span>
-              <span class="text-slate-600">전국연합학력평가 (1, 2, 3학년)</span>
-            </li>
-            <li class="flex justify-between items-center bg-indigo-50 border border-indigo-100 p-2.5 rounded-xl">
-              <span class="font-bold text-indigo-900">9월 22일 ~ 25일</span>
-              <span class="font-bold text-indigo-700">2학기 중간고사</span>
-            </li>
-            <li class="flex justify-between items-center bg-amber-50 border border-amber-100 p-2.5 rounded-xl">
-              <span class="font-bold text-amber-900">10월 02일 (금)</span>
-              <span class="font-bold text-amber-700">재량휴업일</span>
-            </li>
-            <li class="flex justify-between items-center bg-emerald-50 border border-emerald-100 p-2.5 rounded-xl">
-              <span class="font-bold text-emerald-900">10월 17일 (금)</span>
-              <span class="font-bold text-emerald-700">브니엘 예술축제 및 동아리 발표회</span>
-            </li>
+    <!-- Tab 7: MEAL PAGE -->
+    <section id="tab-meal" class="hidden space-y-6">
+      <div class="bg-slate-800/60 border border-slate-700/80 p-6 rounded-3xl shadow-xl">
+        <h2 class="text-xl font-extrabold text-white">오늘의 급식표 및 별점</h2>
+        <p class="text-xs text-slate-400 mt-1">브니엘고등학교 식단 정보입니다.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-slate-800/80 border border-slate-700 rounded-3xl p-6 shadow-xl">
+          <div class="flex items-center justify-between mb-4 border-b border-slate-700/60 pb-3">
+            <span class="text-base font-extrabold text-amber-400 flex items-center gap-2">
+              <i data-lucide="sun" class="w-5 h-5"></i> 점심 (중식)
+            </span>
+            <span class="text-xs bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-full font-bold">12:30 ~ 13:30</span>
+          </div>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li class="flex justify-between p-2 bg-slate-900/50 rounded-xl"><span>친환경 칼슘쌀밥</span> <span class="text-slate-500">알레르기 5</span></li>
+            <li class="flex justify-between p-2 bg-slate-900/50 rounded-xl font-bold text-amber-300"><span>수제 등심돈가스 & 브라운소스</span> <span class="text-slate-500">알레르기 1,2,5,6</span></li>
+            <li class="flex justify-between p-2 bg-slate-900/50 rounded-xl"><span>해물 얼큰 순두부찌개</span> <span class="text-slate-500">알레르기 5,6,9</span></li>
+            <li class="flex justify-between p-2 bg-slate-900/50 rounded-xl"><span>콘마카로니 샐러드</span> <span class="text-slate-500">알레르기 1,5</span></li>
+            <li class="flex justify-between p-2 bg-slate-900/50 rounded-xl"><span>상큼 청포도 에이드</span> <span class="text-slate-500">디저트</span></li>
           </ul>
         </div>
 
-        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-          <h3 class="font-bold text-indigo-900 border-b pb-2 mb-3 flex items-center gap-2">
-            <i data-lucide="calendar-days" class="w-4 h-4 text-indigo-600"></i> 2학기 주요 일정 (11월~1월)
-          </h3>
-          <ul class="space-y-2.5 text-xs">
-            <li class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
-              <span class="font-semibold text-slate-700">11월 19일 (목)</span>
-              <span class="text-slate-600 font-bold text-indigo-900">대학수학능력시험 (수능)</span>
-            </li>
-            <li class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
-              <span class="font-semibold text-slate-700">12월 08일 ~ 11일</span>
-              <span class="text-slate-600">2학기 기말고사</span>
-            </li>
-            <li class="flex justify-between items-center bg-indigo-50 border border-indigo-100 p-2.5 rounded-xl">
-              <span class="font-bold text-indigo-900">12월 28일 (월)</span>
-              <span class="font-bold text-indigo-700">겨울방학식</span>
-            </li>
-            <li class="flex justify-between items-center bg-slate-50 p-2.5 rounded-xl">
-              <span class="font-semibold text-slate-700">2027년 2월 05일</span>
-              <span class="text-slate-600 font-bold">제 50회 졸업식 및 종업식</span>
-            </li>
+        <div class="bg-slate-800/80 border border-slate-700 rounded-3xl p-6 shadow-xl">
+          <div class="flex items-center justify-between mb-4 border-b border-slate-700/60 pb-3">
+            <span class="text-base font-extrabold text-indigo-400 flex items-center gap-2">
+              <i data-lucide="moon" class="w-5 h-5"></i> 저녁 (석식)
+            </span>
+            <span class="text-xs bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-full font-bold">18:00 ~ 19:00</span>
+          </div>
+          <ul class="space-y-2 text-xs text-slate-300">
+            <li class="flex justify-between p-2 bg-slate-900/50 rounded-xl"><span>잡곡밥</span> <span class="text-slate-500">알레르기 5</span></li>
+            <li class="flex justify-between p-2 bg-slate-900/50 rounded-xl font-bold text-indigo-300"><span>안동찜닭 & 당면</span> <span class="text-slate-500">알레르기 5,6,13</span></li>
+            <li class="flex justify-between p-2 bg-slate-900/50 rounded-xl"><span>콩나물국</span> <span class="text-slate-500">알레르기 5</span></li>
+            <li class="flex justify-between p-2 bg-slate-900/50 rounded-xl"><span>초코 쁘띠슈</span> <span class="text-slate-500">디저트</span></li>
           </ul>
         </div>
       </div>
     </section>
 
-    <!-- Tab 7: CAFETERIA / MEAL PAGE -->
-    <section id="tab-meal" class="hidden space-y-6">
-      <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+    <!-- Tab 8: NOTICE PAGE -->
+    <section id="tab-notice" class="hidden space-y-6">
+      <div class="flex items-center justify-between bg-slate-800/60 border border-slate-700/80 p-6 rounded-3xl shadow-xl">
         <div>
-          <h2 class="text-xl font-bold text-slate-800">오늘의 급식표</h2>
-          <p class="text-xs text-slate-500">영양 가득한 브니엘고등학교 식단 정보입니다.</p>
+          <h2 class="text-xl font-extrabold text-white">학교 중요 공지사항</h2>
+          <p class="text-xs text-slate-400 mt-1">브니엘고등학교 주요 소식입니다.</p>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="text-sm font-bold px-3 py-1 bg-indigo-50 text-indigo-700 rounded-lg">2026년 8월 20일 (목)</span>
+        <button id="admin-notice-btn" onclick="openPostModal('공지')" class="hidden bg-amber-400 hover:bg-amber-300 text-slate-950 font-black px-4 py-2.5 rounded-2xl shadow-lg text-xs transition flex items-center gap-1.5">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i> 관리자 공지 작성
+        </button>
+      </div>
+      <div id="notice-full-list" class="space-y-3"></div>
+    </section>
+
+    <!-- Tab 9: MY PAGE -->
+    <section id="tab-mypage" class="hidden space-y-6">
+      <div class="bg-gradient-to-r from-indigo-900 via-slate-900 to-slate-900 border border-indigo-500/40 p-6 rounded-3xl shadow-xl space-y-4">
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 bg-gradient-to-tr from-amber-400 to-indigo-500 rounded-2xl flex items-center justify-center text-slate-950 font-black text-2xl shadow-lg">
+            👤
+          </div>
+          <div>
+            <h2 id="mypage-name-title" class="text-xl font-black text-white">2학년 3반 홍길동</h2>
+            <p class="text-xs text-indigo-300 mt-0.5">브니엘고 인증 학생 회원 계정</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 border-t border-slate-800 pt-4">
+          <div class="bg-slate-900/60 p-3 rounded-2xl border border-slate-800 text-center">
+            <span class="text-[10px] text-slate-400 block">내가 쓴 글</span>
+            <span id="mypage-post-count" class="text-lg font-black text-amber-400">0개</span>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-2xl border border-slate-800 text-center">
+            <span class="text-[10px] text-slate-400 block">내가 쓴 댓글</span>
+            <span id="mypage-comment-count" class="text-lg font-black text-indigo-400">0개</span>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-2xl border border-slate-800 text-center">
+            <span class="text-[10px] text-slate-400 block">받은 좋아요</span>
+            <span id="mypage-like-count" class="text-lg font-black text-rose-400">0개</span>
+          </div>
         </div>
       </div>
 
-      <!-- Meal Cards Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Lunch -->
-        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-          <div class="bg-amber-500 text-white p-4 flex justify-between items-center">
-            <div class="flex items-center gap-2 font-bold">
-              <i data-lucide="sun" class="w-5 h-5"></i> 점심 메뉴 (중식)
-            </div>
-            <span class="text-xs bg-amber-600 px-2.5 py-1 rounded-full">12:30 ~ 13:30</span>
-          </div>
-          <div class="p-5 flex-grow">
-            <ul class="space-y-2 text-sm text-slate-700 mb-6 divide-y divide-slate-50">
-              <li class="pt-2 flex justify-between"><span>친환경 칼슘쌀밥</span> <span class="text-xs text-slate-400">알레르기 5</span></li>
-              <li class="pt-2 flex justify-between"><span class="font-bold text-indigo-900">수제 등심돈가스 & 소스</span> <span class="text-xs text-slate-400">알레르기 1,2,5,6,10</span></li>
-              <li class="pt-2 flex justify-between"><span>해물 순두부찌개</span> <span class="text-xs text-slate-400">알레르기 5,6,9,17</span></li>
-              <li class="pt-2 flex justify-between"><span>콘마카로니 샐러드</span> <span class="text-xs text-slate-400">알레르기 1,5</span></li>
-              <li class="pt-2 flex justify-between"><span>배추김치</span> <span class="text-xs text-slate-400">알레르기 9</span></li>
-              <li class="pt-2 flex justify-between"><span class="text-amber-600 font-semibold">청포도 에이드</span> <span class="text-xs text-slate-400">음료</span></li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- Dinner -->
-        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-          <div class="bg-indigo-900 text-white p-4 flex justify-between items-center">
-            <div class="flex items-center gap-2 font-bold">
-              <i data-lucide="moon" class="w-5 h-5"></i> 저녁 메뉴 (석식)
-            </div>
-            <span class="text-xs bg-indigo-950 px-2.5 py-1 rounded-full">18:00 ~ 19:00</span>
-          </div>
-          <div class="p-5 flex-grow">
-            <ul class="space-y-2 text-sm text-slate-700 mb-6 divide-y divide-slate-50">
-              <li class="pt-2 flex justify-between"><span>잡곡밥</span> <span class="text-xs text-slate-400">알레르기 5</span></li>
-              <li class="pt-2 flex justify-between"><span class="font-bold text-indigo-900">안동찜닭 & 당면</span> <span class="text-xs text-slate-400">알레르기 5,6,13</span></li>
-              <li class="pt-2 flex justify-between"><span>콩나물국</span> <span class="text-xs text-slate-400">알레르기 5</span></li>
-              <li class="pt-2 flex justify-between"><span>도토리묵 야채무침</span> <span class="text-xs text-slate-400">알레르기 5,6</span></li>
-              <li class="pt-2 flex justify-between"><span>깍두기</span> <span class="text-xs text-slate-400">알레르기 9</span></li>
-              <li class="pt-2 flex justify-between"><span class="text-indigo-600 font-semibold">초코 쁘띠슈</span> <span class="text-xs text-slate-400">디저트</span></li>
-            </ul>
-          </div>
+      <div class="bg-slate-800/60 border border-slate-700/80 p-6 rounded-3xl shadow-xl space-y-4">
+        <h3 class="font-extrabold text-base text-white">내가 작성한 활동 내역</h3>
+        <div id="mypage-activity-list" class="space-y-3">
+          <p class="text-xs text-slate-400 py-4 text-center">아직 작성한 활동 내역이 없습니다.</p>
         </div>
       </div>
     </section>
 
   </main>
 
-  <!-- Create Post Modal -->
-  <div id="post-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100">
-      <div class="bg-indigo-900 text-white p-4 flex justify-between items-center">
-        <h3 class="font-bold text-base flex items-center gap-2">
-          <i data-lucide="pen-tool" class="w-4 h-4"></i> 새 게시글 작성
-        </h3>
-        <button onclick="closePostModal()" class="text-indigo-200 hover:text-white">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
+  <!-- Login Modal (Student) -->
+  <div id="login-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-sm w-full shadow-2xl overflow-hidden">
+      <div class="p-6 text-center space-y-2 border-b border-slate-800">
+        <div class="w-12 h-12 bg-indigo-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-2 font-bold shadow-lg">
+          <i data-lucide="user" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-extrabold text-base text-white">학생 프로필 설정</h3>
+        <p class="text-xs text-slate-400">로그인 시 내 활동 관리가 가능하며, 입력하지 않아도 익명으로 자유롭게 이용 가능합니다.</p>
       </div>
 
-      <form id="post-form" onsubmit="handlePostSubmit(event)" class="p-5 space-y-4">
+      <form onsubmit="handleMemberLogin(event)" class="p-6 space-y-4">
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">게시판 선택</label>
-          <select id="post-board-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-            <option value="자유">💬 자유 게시판</option>
-            <option value="질문">❓ Q&A 질문답변</option>
-            <option value="동아리">🎨 동아리 / 학생회</option>
-            <option id="admin-notice-option" value="공지" class="hidden font-bold text-indigo-600">📢 [관리자 전용] 공지사항</option>
-          </select>
+          <label class="block text-xs font-bold text-slate-300 mb-1">학년 / 반 / 이름 (선택)</label>
+          <input type="text" id="login-input-name" placeholder="예: 2학년 3반 홍길동" class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">제목</label>
-          <input type="text" id="post-title" required placeholder="제목을 입력하세요" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">작성자 닉네임</label>
-          <input type="text" id="post-author" placeholder="익명" value="익명 학생" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-        </div>
-
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">내용</label>
-          <textarea id="post-content" rows="5" required placeholder="내용을 입력하세요." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none"></textarea>
-        </div>
-
-        <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closePostModal()" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50">취소</button>
-          <button type="submit" id="submit-btn" class="px-5 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 shadow">등록하기</button>
+        <div class="space-y-2 pt-2">
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-3 rounded-2xl text-xs transition shadow-lg">
+            프로필 저장 및 로그인
+          </button>
+          <button type="button" onclick="closeLoginModal()" class="w-full bg-slate-800 text-slate-400 hover:text-white py-2.5 rounded-2xl text-xs font-semibold">
+            익명으로 계속하기
+          </button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Post Detail & Comment Modal -->
-  <div id="detail-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] shadow-2xl flex flex-col overflow-hidden border border-slate-100">
+  <!-- Admin Login Modal -->
+  <div id="admin-login-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-sm w-full shadow-2xl overflow-hidden">
+      <div class="bg-indigo-950 p-6 text-center relative border-b border-slate-800">
+        <div class="w-12 h-12 bg-amber-400 text-slate-950 rounded-2xl flex items-center justify-center mx-auto mb-2 font-bold shadow-lg">
+          <i data-lucide="shield" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-extrabold text-base text-white">관리자 전용 로그인</h3>
+        <p class="text-xs text-indigo-300 mt-1">4인 전용 관리자 암호를 입력하세요.</p>
+        <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleAdminLogin(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">관리자 암호</label>
+          <input type="password" id="admin-password-input" required placeholder="비밀번호 입력" class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-amber-400">
+          <p id="admin-login-error" class="hidden text-rose-400 text-[11px] mt-1.5 font-bold">비밀번호가 일치하지 않습니다.</p>
+        </div>
+
+        <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700 text-[11px] text-slate-400 space-y-1">
+          <p class="font-bold text-slate-200">💡 시범 관리자 비밀번호 4개:</p>
+          <p>• 관리자 1: <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-300 font-bold">peniel101</code></p>
+          <p>• 관리자 2: <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-300 font-bold">peniel102</code></p>
+          <p>• 관리자 3: <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-300 font-bold">peniel103</code></p>
+          <p>• 관리자 4: <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-300 font-bold">peniel104</code></p>
+        </div>
+
+        <button type="submit" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-black py-3 rounded-2xl text-xs transition shadow-lg">
+          인증 및 관리자 모드 접속
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Dashboard Modal -->
+  <div id="admin-dashboard-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-md w-full shadow-2xl overflow-hidden">
+      <div class="bg-amber-400 text-slate-950 p-4 flex justify-between items-center">
+        <h3 class="font-black text-sm flex items-center gap-1.5">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i> 관리자 대시보드
+        </h3>
+        <button onclick="closeAdminDashboard()" class="text-slate-950 hover:opacity-75">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <div class="flex items-center gap-3 bg-indigo-950/60 p-4 rounded-2xl border border-indigo-500/30">
+          <div class="w-10 h-10 bg-amber-400 text-slate-950 rounded-xl flex items-center justify-center font-black">
+            <i data-lucide="user-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="text-xs text-indigo-300 font-bold block">현재 권한 계정</span>
+            <span id="dash-admin-name" class="text-sm font-black text-white">관리자 1</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-slate-800 p-3.5 rounded-2xl border border-slate-700 text-center">
+            <span class="text-[11px] text-slate-400">총 게시글</span>
+            <span id="dash-total-posts" class="block text-xl font-black text-white mt-0.5">0</span>
+          </div>
+          <div class="bg-slate-800 p-3.5 rounded-2xl border border-slate-700 text-center">
+            <span class="text-[11px] text-slate-400">총 댓글</span>
+            <span id="dash-total-comments" class="block text-xl font-black text-indigo-400 mt-0.5">0</span>
+          </div>
+        </div>
+
+        <div class="pt-2 text-right">
+          <button onclick="logoutAdmin()" class="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-500">관리자 로그아웃</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Warning Modal -->
+  <div id="delete-confirm-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 rounded-3xl max-w-sm w-full shadow-2xl p-6 border border-slate-700 text-center space-y-4">
+      <div class="w-12 h-12 bg-rose-500/20 text-rose-400 rounded-2xl flex items-center justify-center mx-auto">
+        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+      </div>
+      <div>
+        <h3 class="font-extrabold text-white text-base" id="delete-confirm-title">정말로 삭제하시겠습니까?</h3>
+        <p class="text-xs text-slate-400 mt-1" id="delete-confirm-desc">삭제된 데이터는 복구할 수 없습니다.</p>
+      </div>
+      <div class="flex justify-center gap-2 pt-2">
+        <button onclick="closeDeleteConfirmModal()" class="w-1/2 py-2.5 border border-slate-700 text-slate-300 rounded-2xl text-xs font-bold hover:bg-slate-800">취소</button>
+        <button id="confirm-delete-action-btn" class="w-1/2 py-2.5 bg-rose-600 text-white rounded-2xl text-xs font-black hover:bg-rose-500 shadow-lg">삭제하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Post Modal -->
+  <div id="post-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden">
+      <div class="bg-indigo-950/80 p-4 border-b border-slate-800 flex justify-between items-center">
+        <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+          <i data-lucide="edit-3" class="w-4 h-4 text-amber-400"></i> 새 글 작성하기
+        </h3>
+        <button onclick="closePostModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="post-form" onsubmit="handlePostSubmit(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">게시판 선택</label>
+          <select id="post-board-type" class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <option value="자유">💬 자유 게시판 (익명)</option>
+            <option value="선생님칭찬">💖 선생님 칭찬의 전당</option>
+            <option value="질문">❓ Q&A 질문답변</option>
+            <option id="admin-notice-option" value="공지" class="hidden font-bold text-amber-400">📢 [관리자 전용] 공지사항</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">제목</label>
+          <input type="text" id="post-title" required placeholder="제목을 입력하세요" class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">작성자 닉네임</label>
+          <input type="text" id="post-author" placeholder="익명" value="익명 학생" class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">내용</label>
+          <textarea id="post-content" rows="5" required placeholder="내용을 작성하세요..." class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closePostModal()" class="px-4 py-2.5 border border-slate-700 text-slate-300 rounded-2xl text-xs font-bold hover:bg-slate-800">취소</button>
+          <button type="submit" class="px-5 py-2.5 bg-indigo-600 text-white rounded-2xl text-xs font-extrabold hover:bg-indigo-500 shadow-lg">등록하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Post Detail Modal -->
+  <div id="detail-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full max-h-[90vh] shadow-2xl flex flex-col overflow-hidden">
       
-      <!-- Modal Header -->
-      <div class="bg-slate-900 text-white p-4 flex justify-between items-center">
-        <span id="detail-board-badge" class="bg-indigo-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-full">자유</span>
+      <div class="bg-slate-950 p-4 border-b border-slate-800 flex justify-between items-center">
+        <span id="detail-board-badge" class="bg-indigo-600 text-white text-[11px] font-extrabold px-3 py-1 rounded-full">자유</span>
         <div class="flex items-center gap-2">
-          <button id="admin-delete-post-btn" onclick="triggerDeletePostPrompt()" class="hidden bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-1 rounded-lg flex items-center gap-1">
+          <button id="admin-delete-post-btn" onclick="triggerDeletePostPrompt()" class="hidden bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold px-3 py-1.5 rounded-xl flex items-center gap-1 shadow">
             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> 게시글 삭제
           </button>
           <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white">
@@ -497,217 +701,95 @@
         </div>
       </div>
 
-      <!-- Modal Body (Scrollable) -->
       <div class="p-6 overflow-y-auto custom-scrollbar flex-grow space-y-6">
         <div>
           <div class="flex justify-between items-center text-xs text-slate-400 mb-2">
-            <span id="detail-author" class="font-semibold text-slate-700">작성자</span>
+            <span id="detail-author" class="font-bold text-indigo-300">작성자</span>
             <span id="detail-date">날짜</span>
           </div>
-          <h2 id="detail-title" class="text-xl font-bold text-slate-800 leading-snug">제목</h2>
+          <h2 id="detail-title" class="text-xl font-extrabold text-white leading-snug">제목</h2>
         </div>
 
-        <div id="detail-content" class="text-sm text-slate-700 whitespace-pre-line leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100 min-h-[100px]">
-          게시물 내용
+        <div id="detail-content" class="text-xs text-slate-200 whitespace-pre-line leading-relaxed bg-slate-800/60 p-4 rounded-2xl border border-slate-700/60 min-h-[100px]">
+          내용
         </div>
 
-        <!-- Action Bar (Likes) -->
-        <div class="flex items-center justify-between border-t border-b border-slate-100 py-3">
-          <button id="like-toggle-btn" onclick="toggleLikeCurrentPost()" class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition border border-slate-200 hover:bg-rose-50 hover:border-rose-200">
-            <i data-lucide="heart" class="w-4 h-4 text-rose-500"></i>
+        <div class="flex items-center justify-between border-t border-b border-slate-800 py-3">
+          <button id="like-toggle-btn" onclick="toggleLikeCurrentPost()" class="flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-bold transition border border-slate-700 text-slate-300 hover:bg-rose-500/20 hover:border-rose-400">
+            <i data-lucide="heart" class="w-4 h-4 text-rose-400"></i>
             <span>좋아요</span>
-            <span id="detail-likes-count" class="bg-slate-100 px-2 py-0.5 rounded-full text-slate-700">0</span>
+            <span id="detail-likes-count" class="bg-slate-800 px-2 py-0.5 rounded-full text-white">0</span>
           </button>
           <span class="text-xs text-slate-400 flex items-center gap-1">
             <i data-lucide="message-square" class="w-3.5 h-3.5"></i> 댓글 <span id="detail-comments-count">0</span>개
           </span>
         </div>
 
-        <!-- Comment Section -->
         <div class="space-y-4">
-          <h4 class="font-bold text-sm text-slate-800 flex items-center gap-1.5">
-            <i data-lucide="messages-square" class="w-4 h-4 text-indigo-600"></i> 댓글 목록
+          <h4 class="font-extrabold text-sm text-white flex items-center gap-1.5">
+            <i data-lucide="messages-square" class="w-4 h-4 text-indigo-400"></i> 댓글
           </h4>
 
-          <!-- New Comment Input -->
           <form onsubmit="handleCommentSubmit(event)" class="flex gap-2">
-            <input type="text" id="comment-input" required placeholder="상대방을 존중하는 댓글을 남겨주세요..." class="flex-grow bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-            <button type="submit" id="comment-submit-btn" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-xl text-xs hover:bg-indigo-700 transition">등록</button>
+            <input type="text" id="comment-input" required placeholder="댓글을 입력하세요..." class="flex-grow bg-slate-800 border border-slate-700 rounded-2xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <button type="submit" class="bg-indigo-600 text-white font-extrabold px-4 py-2.5 rounded-2xl text-xs hover:bg-indigo-500 shadow-md">등록</button>
           </form>
 
-          <!-- Comment List -->
-          <div id="comment-list" class="space-y-2.5 pt-2">
-            <!-- Dynamic comments -->
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Admin Delete Confirmation Warning Modal -->
-  <div id="delete-confirm-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl p-5 border border-slate-100 text-center space-y-4">
-      <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto">
-        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
-      </div>
-      <div>
-        <h3 class="font-bold text-slate-800 text-base" id="delete-confirm-title">정말로 삭제하시겠습니까?</h3>
-        <p class="text-xs text-slate-500 mt-1" id="delete-confirm-desc">삭제된 데이터는 복구할 수 없습니다.</p>
-      </div>
-      <div class="flex justify-center gap-2 pt-2">
-        <button onclick="closeDeleteConfirmModal()" class="w-1/2 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50">취소</button>
-        <button id="confirm-delete-action-btn" class="w-1/2 py-2.5 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700 shadow">삭제하기</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Admin Login Modal -->
-  <div id="admin-login-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden border border-slate-100">
-      <div class="bg-indigo-950 text-white p-5 text-center relative">
-        <div class="w-12 h-12 bg-amber-400 text-indigo-950 rounded-full flex items-center justify-center mx-auto mb-2 font-bold shadow">
-          <i data-lucide="shield" class="w-6 h-6"></i>
-        </div>
-        <h3 class="font-bold text-base">브니엘고 관리자 로그인</h3>
-        <p class="text-xs text-indigo-200 mt-1">지정된 4인 전용 관리자 암호를 입력하세요.</p>
-        <button onclick="closeAdminModal()" class="absolute top-4 right-4 text-indigo-300 hover:text-white">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <form onsubmit="handleAdminLogin(event)" class="p-5 space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">관리자 비밀번호</label>
-          <input type="password" id="admin-password-input" required placeholder="비밀번호 입력" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
-          <p id="admin-login-error" class="hidden text-rose-500 text-[11px] mt-1 font-medium">비밀번호가 올바르지 않습니다.</p>
-        </div>
-
-        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-[11px] text-slate-500 space-y-1">
-          <p class="font-bold text-slate-700">💡 시범 관리자 암호 4개:</p>
-          <p>• 관리자 1: <code class="bg-slate-200 px-1 rounded text-indigo-900 font-bold">peniel101</code></p>
-          <p>• 관리자 2: <code class="bg-slate-200 px-1 rounded text-indigo-900 font-bold">peniel102</code></p>
-          <p>• 관리자 3: <code class="bg-slate-200 px-1 rounded text-indigo-900 font-bold">peniel103</code></p>
-          <p>• 관리자 4: <code class="bg-slate-200 px-1 rounded text-indigo-900 font-bold">peniel104</code></p>
-        </div>
-
-        <button type="submit" class="w-full bg-indigo-900 text-amber-400 font-bold py-2.5 rounded-xl text-xs hover:bg-indigo-800 transition shadow">
-          인증 및 접속하기
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Admin Dashboard Modal -->
-  <div id="admin-dashboard-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100">
-      <div class="bg-amber-500 text-indigo-950 p-4 flex justify-between items-center">
-        <h3 class="font-bold text-sm flex items-center gap-1.5">
-          <i data-lucide="layout-dashboard" class="w-4 h-4"></i> 관리자 대시보드
-        </h3>
-        <button onclick="closeAdminDashboard()" class="text-indigo-950 hover:opacity-75">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <div class="p-5 space-y-4">
-        <div class="flex items-center gap-3 bg-indigo-50 p-3.5 rounded-xl border border-indigo-100">
-          <div class="w-10 h-10 bg-indigo-900 text-amber-400 rounded-full flex items-center justify-center font-bold">
-            <i data-lucide="user-check" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <span class="text-xs text-indigo-600 font-bold block">현재 승인된 접속자</span>
-            <span id="dash-admin-name" class="text-sm font-extrabold text-indigo-950">관리자 1</span>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
-            <span class="text-[11px] text-slate-500">전체 게시글</span>
-            <span id="dash-total-posts" class="block text-xl font-black text-slate-800 mt-0.5">0</span>
-          </div>
-          <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
-            <span class="text-[11px] text-slate-500">등록된 댓글</span>
-            <span id="dash-total-comments" class="block text-xl font-black text-indigo-600 mt-0.5">0</span>
-          </div>
-        </div>
-
-        <div class="border-t border-slate-100 pt-3">
-          <h4 class="font-bold text-xs text-slate-700 mb-2">등록된 4인 관리자 명단</h4>
-          <ul class="text-xs space-y-1.5 text-slate-600">
-            <li class="flex justify-between bg-slate-50 p-2 rounded-lg"><span>1번 관리자 (peniel101)</span> <span class="text-emerald-600 font-bold">활성</span></li>
-            <li class="flex justify-between bg-slate-50 p-2 rounded-lg"><span>2번 관리자 (peniel102)</span> <span class="text-emerald-600 font-bold">활성</span></li>
-            <li class="flex justify-between bg-slate-50 p-2 rounded-lg"><span>3번 관리자 (peniel103)</span> <span class="text-emerald-600 font-bold">활성</span></li>
-            <li class="flex justify-between bg-slate-50 p-2 rounded-lg"><span>4번 관리자 (peniel104)</span> <span class="text-emerald-600 font-bold">활성</span></li>
-          </ul>
-        </div>
-
-        <div class="pt-2 text-right">
-          <button onclick="logoutAdmin()" class="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700">관리자 로그아웃</button>
+          <div id="comment-list" class="space-y-2.5 pt-2"></div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Notice Detail Modal -->
-  <div id="notice-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100">
-      <div class="bg-indigo-900 text-white p-4 flex justify-between items-center">
-        <span class="bg-amber-400 text-indigo-950 text-xs font-bold px-2.5 py-0.5 rounded-full">공지사항</span>
-        <button onclick="closeNoticeModal()" class="text-indigo-200 hover:text-white">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
+  <div id="notice-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full shadow-2xl p-6 space-y-4">
+      <div class="flex justify-between items-center">
+        <span class="bg-amber-400 text-slate-950 text-xs font-black px-3 py-1 rounded-full">공지사항</span>
+        <button onclick="closeNoticeModal()" class="text-slate-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
-      <div class="p-6 space-y-4">
-        <div class="text-xs text-slate-400 flex justify-between">
-          <span id="notice-modal-tag" class="text-indigo-600 font-semibold">카테고리</span>
-          <span id="notice-modal-date">2026.08.20</span>
-        </div>
-        <h3 id="notice-modal-title" class="text-lg font-bold text-slate-800">공지 제목</h3>
-        <p id="notice-modal-content" class="text-xs text-slate-600 whitespace-pre-line leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100">공지 내용</p>
-        <div class="text-right">
-          <button onclick="closeNoticeModal()" class="px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded-xl">닫기</button>
-        </div>
-      </div>
+      <h3 id="notice-modal-title" class="text-lg font-extrabold text-white">공지 제목</h3>
+      <p id="notice-modal-content" class="text-xs text-slate-300 whitespace-pre-line leading-relaxed bg-slate-800 p-4 rounded-2xl border border-slate-700">내용</p>
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer class="bg-white border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
-    <div class="max-w-6xl mx-auto px-4 space-y-2">
-      <p class="font-semibold text-slate-700">브니엘고등학교 학생 커뮤니티 Web App</p>
-      <p>부산광역시 금정구 구서동 위치 | 본 웹사이트는 학생용 커뮤니티 시범 제작 프로젝트입니다.</p>
-      <p class="text-slate-400">© 2026 Peniel High School Community. All rights reserved.</p>
-    </div>
-  </footer>
+  <!-- Application Logic -->
+  <script>
+    let allPosts = JSON.parse(localStorage.getItem('peniel_space_posts')) || [
+      {
+        id: 'post_1',
+        boardType: '자유',
+        title: '중간고사 자습실 꿀팁 알려드림!',
+        author: '3학년 선배',
+        content: '본관 2층 정독실 창가 자리가 햇빛도 잘 들어오고 졸릴 때 잠깨기 최고입니다. 다들 시험 열공하세요!',
+        dateStr: '2026.08.21',
+        createdAt: Date.now() - 10000,
+        likedUsers: ['user1', 'user2'],
+        comments: [
+          { id: 'c1', author: '2학년 익명', text: '좋은 정보 감사합니다 선배님!', dateStr: '8/21 13:10' }
+        ]
+      },
+      {
+        id: 'post_2',
+        boardType: '선생님칭찬',
+        title: '수학 선생님 오늘 보강 수업 너무 감사했습니다!',
+        author: '2학년 학생',
+        content: '어려운 적분 파트 차근차근 다시 설명해주셔서 드디어 이해했어요. 항상 학생들 편에서 응원해주셔서 고맙습니다!',
+        dateStr: '2026.08.21',
+        createdAt: Date.now() - 50000,
+        likedUsers: ['user1', 'user2', 'user3', 'user4'],
+        comments: []
+      }
+    ];
 
-  <!-- Firebase & App Logic Script -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-    import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+    let memberUser = JSON.parse(localStorage.getItem('peniel_space_member')) || null;
+    let currentAdminRole = null; // null or 관리자명
+    let currentUserUid = localStorage.getItem('peniel_space_uid') || 'uid_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('peniel_space_uid', currentUserUid);
 
-    // Firebase Global Setup
-    const firebaseConfig = typeof __firebase_config !== 'undefined' 
-      ? JSON.parse(__firebase_config) 
-      : { apiKey: "demo", authDomain: "demo", projectId: "demo" };
-
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'peniel-high-app';
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let currentUser = null;
-    let currentAdminRole = null; 
-    let allPosts = [];
     let activePostId = null;
     let pendingDeleteAction = null;
 
-    /*
-      ==========================================================
-      💡 [관리자 비밀번호 설정 가이드]
-      원하시는 4가지 비밀번호로 따옴표 안의 문자를 변경해 사용하세요!
-      ==========================================================
-    */
     const ADMIN_PASSWORDS = {
       'peniel101': '관리자 1 (학생회장)',
       'peniel102': '관리자 2 (부학생회장)',
@@ -715,124 +797,52 @@
       'peniel104': '관리자 4 (담당교사)'
     };
 
-    // 학사일정 달력 데이터 (2026년 기준)
     const ACADEMIC_EVENTS = {
       "2026-08-18": { title: "2학기 개학식", type: "blue" },
       "2026-09-03": { title: "모의고사", type: "indigo" },
       "2026-09-22": { title: "중간고사 시작", type: "red" },
-      "2026-09-23": { title: "중간고사 2일차", type: "red" },
-      "2026-09-24": { title: "중간고사 3일차", type: "red" },
       "2026-09-25": { title: "중간고사 종료", type: "red" },
-      "2026-10-02": { title: "재량휴업일", type: "amber" },
-      "2026-10-17": { title: "브니엘 축제", type: "emerald" },
-      "2026-11-19": { title: "대학수능시험", type: "red" },
-      "2026-12-08": { title: "기말고사 시작", type: "red" },
-      "2026-12-11": { title: "기말고사 종료", type: "red" },
-      "2026-12-28": { title: "겨울방학식", type: "amber" }
+      "2026-10-17": { title: "브니엘 축제", type: "emerald" }
     };
 
     let calendarYear = 2026;
-    let calendarMonth = 8; // 8월 기본값
+    let calendarMonth = 8;
 
-    // Static Base Notices
     const defaultNotices = [
       {
         id: 'n1',
-        title: '2026학년도 2학기 학사 일정 및 중간고사 시간표 안내',
+        title: '2026학년도 2학기 중간고사 시험 범위 및 시간표 안내',
         date: '2026.08.18',
         tag: '학사일정',
-        content: '2학기 중간고사는 9월 22일부터 9월 25일까지 진행됩니다. 세부 공부 일정 및 준비사항을 점검해 주세요.',
-        important: true
+        content: '2학기 중간고사는 9월 22일부터 9월 25일까지 실시됩니다. 준비에 만전을 기해주시기 바랍니다.'
       },
       {
         id: 'n2',
-        title: '동아리 발표회 및 브니엘 예술축제 부스 신청 안내',
+        title: '브니엘 예술축제 동아리 참가 부스 신청 안내',
         date: '2026.08.15',
         tag: '축제',
-        content: '10월 17일에 열리는 브니엘 예술축제 부스 운영을 희망하는 동아리는 신청서를 제출해 주세요.',
-        important: false
+        content: '10월 17일 축제 부스 운영을 희망하는 동아리는 신청서를 제출해주세요.'
       }
     ];
 
-    window.addEventListener('DOMContentLoaded', async () => {
+    window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
-
-      try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
-        }
-      } catch (e) {
-        console.error("Auth Error:", e);
-      }
-
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          currentUser = user;
-          initPostsListener();
-        }
-      });
-
+      updateAuthUI();
+      renderAllBoardFeeds();
       renderNotices();
       renderCalendar(calendarYear, calendarMonth);
     });
 
-    // Calendar Renderer
-    function renderCalendar(year, month) {
-      document.getElementById('calendar-month-title').innerText = `${year}년 ${month}월`;
-      const grid = document.getElementById('calendar-grid');
-      grid.innerHTML = '';
-
-      const firstDay = new Date(year, month - 1, 1).getDay();
-      const lastDate = new Date(year, month, 0).getDate();
-
-      // Empty lead cells
-      for (let i = 0; i < firstDay; i++) {
-        grid.innerHTML += `<div class="h-20 bg-slate-50/50 rounded-xl"></div>`;
-      }
-
-      // Date cells
-      for (let day = 1; day <= lastDate; day++) {
-        const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const event = ACADEMIC_EVENTS[dateStr];
-
-        let badgeHtml = '';
-        if (event) {
-          const colorClasses = {
-            red: 'bg-rose-100 text-rose-700 border-rose-200',
-            blue: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-            indigo: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-            amber: 'bg-amber-100 text-amber-800 border-amber-200',
-            emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200'
-          };
-          badgeHtml = `<span class="block mt-1 text-[10px] font-bold p-1 rounded-md border ${colorClasses[event.type] || 'bg-slate-100'} truncate">${event.title}</span>`;
-        }
-
-        const isToday = day === 20 && month === 8 && year === 2026;
-
-        grid.innerHTML += `
-          <div class="h-20 bg-white p-1.5 rounded-xl border ${isToday ? 'border-2 border-indigo-600 bg-indigo-50/30' : 'border-slate-100'} flex flex-col justify-between">
-            <span class="text-xs font-bold ${isToday ? 'text-indigo-600' : 'text-slate-700'}">${day}</span>
-            <div class="overflow-hidden">${badgeHtml}</div>
-          </div>
-        `;
+    function saveData() {
+      localStorage.setItem('peniel_space_posts', JSON.stringify(allPosts));
+      renderAllBoardFeeds();
+      if (activePostId) {
+        const post = allPosts.find(p => p.id === activePostId);
+        if (post) renderPostDetailModal(post);
       }
     }
 
-    window.changeCalendarMonth = (delta) => {
-      calendarMonth += delta;
-      if (calendarMonth > 12) {
-        calendarMonth = 1;
-        calendarYear++;
-      } else if (calendarMonth < 1) {
-        calendarMonth = 12;
-        calendarYear--;
-      }
-      renderCalendar(calendarYear, calendarMonth);
-    };
-
-    // Admin Login Handler
+    // Admin Authentication Handlers
     window.handleAdminLogin = (e) => {
       e.preventDefault();
       const pwdInput = document.getElementById('admin-password-input');
@@ -879,7 +889,7 @@
         adminTopBanner.classList.add('hidden');
       }
 
-      renderPostsByBoard();
+      renderAllBoardFeeds();
       if (activePostId) {
         const post = allPosts.find(p => p.id === activePostId);
         if (post) renderPostDetailModal(post);
@@ -887,155 +897,191 @@
       lucide.createIcons();
     }
 
-    // Realtime Listener for Posts
-    function initPostsListener() {
-      if (!currentUser) return;
+    function updateAuthUI() {
+      const guestDiv = document.getElementById('user-status-guest');
+      const memberDiv = document.getElementById('user-status-member');
+      const profileName = document.getElementById('user-profile-name');
 
-      const postsCol = collection(db, 'artifacts', appId, 'public', 'data', 'posts');
-
-      onSnapshot(postsCol, (snapshot) => {
-        allPosts = [];
-        snapshot.forEach((doc) => {
-          allPosts.push({ id: doc.id, ...doc.data() });
-        });
-
-        allPosts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-
-        renderPostsByBoard();
-        
-        if (activePostId) {
-          const updatedPost = allPosts.find(p => p.id === activePostId);
-          if (updatedPost) renderPostDetailModal(updatedPost);
-        }
-      }, (err) => {
-        console.error("Firestore Listen Error:", err);
-      });
+      if (memberUser) {
+        guestDiv.classList.add('hidden');
+        memberDiv.classList.remove('hidden');
+        profileName.innerText = memberUser.name;
+      } else {
+        guestDiv.classList.remove('hidden');
+        memberDiv.classList.add('hidden');
+      }
     }
 
-    // Render Notices
+    function renderAllBoardFeeds() {
+      const freePosts = allPosts.filter(p => (p.boardType || '자유') === '자유');
+      const teacherPosts = allPosts.filter(p => p.boardType === '선생님칭찬');
+      const qnaPosts = allPosts.filter(p => p.boardType === '질문');
+
+      // Home Hot Feed Snippets
+      const homeFreeFeed = document.getElementById('home-free-feed');
+      if (freePosts.length === 0) {
+        homeFreeFeed.innerHTML = `<p class="text-xs text-slate-400 py-3">등록된 게시물이 없습니다.</p>`;
+      } else {
+        homeFreeFeed.innerHTML = freePosts.slice(0, 3).map((p, idx) => `
+          <div onclick="openPostDetail('${p.id}')" class="p-3.5 bg-slate-900/60 rounded-2xl hover:bg-slate-700/40 transition cursor-pointer flex justify-between items-center border border-slate-700/60">
+            <div class="flex items-center gap-3 overflow-hidden">
+              <span class="font-black text-xs ${idx === 0 ? 'text-amber-400' : 'text-slate-500'}">0${idx + 1}</span>
+              <span class="text-xs font-bold text-white truncate">${escapeHtml(p.title)}</span>
+            </div>
+            <span class="text-[11px] text-slate-400 shrink-0 flex items-center gap-1">
+              <i data-lucide="heart" class="w-3 h-3 text-rose-400"></i> ${p.likedUsers ? p.likedUsers.length : 0}
+            </span>
+          </div>
+        `).join('');
+      }
+
+      // Home Teacher Praise Feed Snippets
+      const homeTeacherFeed = document.getElementById('home-teacher-feed');
+      if (teacherPosts.length === 0) {
+        homeTeacherFeed.innerHTML = `<p class="text-xs text-slate-400 py-3 col-span-2">선생님 칭찬글이 아직 없습니다. 첫 칭찬을 작성해보세요!</p>`;
+      } else {
+        homeTeacherFeed.innerHTML = teacherPosts.slice(0, 2).map(p => `
+          <div onclick="openPostDetail('${p.id}')" class="p-3.5 bg-rose-950/20 border border-rose-500/30 rounded-2xl cursor-pointer hover:border-rose-400 transition space-y-1.5">
+            <span class="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded-full font-bold">💖 칭찬</span>
+            <h4 class="text-xs font-bold text-white truncate">${escapeHtml(p.title)}</h4>
+            <p class="text-[11px] text-slate-300 line-clamp-1">${escapeHtml(p.content)}</p>
+          </div>
+        `).join('');
+      }
+
+      renderBoardList('posts-container-free', freePosts);
+      renderBoardList('posts-container-qna', qnaPosts);
+      renderTeacherCards('posts-container-teachers', teacherPosts);
+
+      lucide.createIcons();
+    }
+
+    function renderBoardList(containerId, posts) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      if (posts.length === 0) {
+        container.innerHTML = `<div class="bg-slate-800/60 p-8 rounded-3xl text-center text-xs text-slate-400 border border-slate-700">글이 없습니다. 첫 글을 등록해보세요!</div>`;
+        return;
+      }
+
+      container.innerHTML = posts.map(p => `
+        <div onclick="openPostDetail('${p.id}')" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-3xl shadow-lg hover:border-indigo-500/50 transition cursor-pointer relative">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-bold text-indigo-300 bg-indigo-500/20 px-2.5 py-0.5 rounded-lg">${escapeHtml(p.author)}</span>
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] text-slate-400">${p.dateStr}</span>
+              ${currentAdminRole ? `<button onclick="event.stopPropagation(); triggerDeletePostPromptDirect('${p.id}')" class="text-rose-400 text-xs font-bold hover:bg-rose-500/20 px-2 py-0.5 rounded">삭제</button>` : ''}
+            </div>
+          </div>
+          <h3 class="font-bold text-sm text-white mb-1">${escapeHtml(p.title)}</h3>
+          <p class="text-xs text-slate-300 line-clamp-2 mb-3 leading-relaxed">${escapeHtml(p.content)}</p>
+          <div class="flex items-center gap-4 text-xs text-slate-400 pt-2 border-t border-slate-700/50">
+            <span>❤️ 좋아요 ${(p.likedUsers || []).length}</span>
+            <span>💬 댓글 ${(p.comments || []).length}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderTeacherCards(containerId, posts) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      if (posts.length === 0) {
+        container.innerHTML = `<div class="col-span-2 bg-slate-800/60 p-8 rounded-3xl text-center text-xs text-slate-400 border border-slate-700">선생님 칭찬글이 없습니다. 고마웠던 선생님께 마음을 남겨주세요!</div>`;
+        return;
+      }
+
+      container.innerHTML = posts.map(p => `
+        <div onclick="openPostDetail('${p.id}')" class="bg-gradient-to-br from-slate-800 to-slate-900 border border-rose-500/30 p-5 rounded-3xl shadow-xl hover:border-rose-400 transition cursor-pointer space-y-3 relative">
+          <div class="flex justify-between items-center">
+            <span class="bg-rose-500/20 text-rose-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full">💖 선생님 칭찬</span>
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] text-slate-400">${p.dateStr}</span>
+              ${currentAdminRole ? `<button onclick="event.stopPropagation(); triggerDeletePostPromptDirect('${p.id}')" class="text-rose-400 text-xs font-bold hover:bg-rose-500/20 px-2 py-0.5 rounded">삭제</button>` : ''}
+            </div>
+          </div>
+          <h3 class="font-bold text-sm text-white">${escapeHtml(p.title)}</h3>
+          <p class="text-xs text-slate-300 leading-relaxed line-clamp-3">${escapeHtml(p.content)}</p>
+          <div class="text-[11px] text-rose-300 font-bold text-right pt-2 border-t border-slate-800">
+            작성자: ${escapeHtml(p.author)}
+          </div>
+        </div>
+      `).join('');
+    }
+
     function renderNotices() {
-      const homeList = document.getElementById('home-notice-list');
       const fullList = document.getElementById('notice-full-list');
+      const snippet = document.getElementById('home-notice-snippet');
 
       const noticePosts = allPosts.filter(p => p.boardType === '공지');
 
-      homeList.innerHTML = defaultNotices.slice(0, 2).map(n => `
-        <div onclick="window.openNoticeModal('${n.id}')" class="flex items-center justify-between p-2.5 hover:bg-slate-50 rounded-xl transition cursor-pointer border border-transparent hover:border-slate-100">
-          <div class="flex items-center gap-2 overflow-hidden">
-            ${n.important ? `<span class="bg-red-100 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded">필독</span>` : ''}
-            <span class="text-xs text-slate-800 font-medium truncate">${n.title}</span>
-          </div>
-          <span class="text-[11px] text-slate-400 shrink-0">${n.date}</span>
-        </div>
-      `).join('') + noticePosts.slice(0, 2).map(p => `
-        <div onclick="window.openPostDetail('${p.id}')" class="flex items-center justify-between p-2.5 hover:bg-slate-50 rounded-xl transition cursor-pointer border border-transparent hover:border-slate-100">
-          <div class="flex items-center gap-2 overflow-hidden">
-            <span class="bg-amber-100 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded">공지</span>
-            <span class="text-xs text-slate-800 font-medium truncate">${escapeHtml(p.title)}</span>
-          </div>
-          <span class="text-[11px] text-slate-400 shrink-0">${p.dateStr}</span>
+      snippet.innerHTML = defaultNotices.slice(0, 1).map(n => `
+        <div onclick="openNoticeModal('${n.id}')" class="p-2.5 bg-slate-900/60 rounded-2xl hover:bg-slate-700/50 cursor-pointer transition border border-slate-700/60">
+          <span class="text-xs font-bold text-white block truncate">${n.title}</span>
+          <span class="text-[10px] text-slate-400 mt-1 block">${n.date}</span>
         </div>
       `).join('');
 
       fullList.innerHTML = defaultNotices.map(n => `
-        <div onclick="window.openNoticeModal('${n.id}')" class="p-4 hover:bg-slate-50 transition cursor-pointer">
-          <div class="flex items-center gap-2 mb-1">
-            <span class="bg-indigo-100 text-indigo-700 text-[11px] font-semibold px-2 py-0.5 rounded-full">${n.tag}</span>
-            <span class="text-xs text-slate-400">${n.date}</span>
-          </div>
-          <h4 class="font-bold text-sm text-slate-800 mb-1">${n.title}</h4>
-          <p class="text-xs text-slate-600 line-clamp-1">${n.content}</p>
+        <div onclick="openNoticeModal('${n.id}')" class="bg-slate-800/80 border border-slate-700/80 p-5 rounded-3xl cursor-pointer hover:border-amber-400/50 transition">
+          <span class="bg-indigo-500/20 text-indigo-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full">${n.tag}</span>
+          <h4 class="font-bold text-sm text-white mt-2 mb-1">${n.title}</h4>
+          <p class="text-xs text-slate-400 line-clamp-1">${n.content}</p>
         </div>
       `).join('') + noticePosts.map(p => `
-        <div onclick="window.openPostDetail('${p.id}')" class="p-4 hover:bg-slate-50 transition cursor-pointer border-l-4 border-amber-400">
+        <div onclick="openPostDetail('${p.id}')" class="bg-slate-800/80 border-l-4 border-amber-400 p-5 rounded-3xl cursor-pointer hover:border-amber-300 transition">
           <div class="flex items-center justify-between mb-1">
+            <span class="bg-amber-400/20 text-amber-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full">공지사항</span>
             <div class="flex items-center gap-2">
-              <span class="bg-amber-100 text-amber-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full">공지사항</span>
               <span class="text-xs text-slate-400">${p.dateStr}</span>
+              ${currentAdminRole ? `<button onclick="event.stopPropagation(); triggerDeletePostPromptDirect('${p.id}')" class="text-rose-400 text-xs font-bold hover:underline">삭제</button>` : ''}
             </div>
-            ${currentAdminRole ? `<button onclick="event.stopPropagation(); window.triggerDeletePostPromptDirect('${p.id}')" class="text-rose-600 text-xs font-bold hover:underline">삭제</button>` : ''}
           </div>
-          <h4 class="font-bold text-sm text-slate-800 mb-1">${escapeHtml(p.title)}</h4>
-          <p class="text-xs text-slate-600 line-clamp-1">${escapeHtml(p.content)}</p>
+          <h4 class="font-bold text-sm text-white mb-1">${escapeHtml(p.title)}</h4>
+          <p class="text-xs text-slate-300 line-clamp-1">${escapeHtml(p.content)}</p>
         </div>
       `).join('');
     }
 
-    // Render Posts by Category
-    function renderPostsByBoard() {
-      const freePosts = allPosts.filter(p => (p.boardType || '자유') === '자유');
-      const qnaPosts = allPosts.filter(p => p.boardType === '질문');
-      const clubPosts = allPosts.filter(p => p.boardType === '동아리');
+    function renderCalendar(year, month) {
+      document.getElementById('calendar-month-title').innerText = `${year}년 ${month}월`;
+      const grid = document.getElementById('calendar-grid');
+      grid.innerHTML = '';
 
-      renderBoardFeed('posts-container-free', freePosts);
-      renderBoardFeed('posts-container-qna', qnaPosts);
-      renderBoardFeed('posts-container-club', clubPosts);
-      renderNotices();
+      const firstDay = new Date(year, month - 1, 1).getDay();
+      const lastDate = new Date(year, month, 0).getDate();
 
-      // Render Home Recent Feed
-      const homeFreeList = document.getElementById('home-free-list');
-      if (freePosts.length === 0) {
-        homeFreeList.innerHTML = `<p class="text-xs text-slate-400 py-2">등록된 자유게시물이 없습니다.</p>`;
-      } else {
-        homeFreeList.innerHTML = freePosts.slice(0, 3).map(p => `
-          <div onclick="window.openPostDetail('${p.id}')" class="p-2.5 bg-slate-50 rounded-xl hover:bg-indigo-50/50 transition cursor-pointer flex justify-between items-center border border-slate-100">
-            <span class="text-xs font-semibold text-slate-800 truncate">${escapeHtml(p.title)}</span>
-            <div class="flex items-center gap-2 text-[11px] text-slate-400 shrink-0">
-              <span class="flex items-center gap-0.5"><i data-lucide="heart" class="w-3 h-3 text-rose-500"></i> ${p.likedUsers ? p.likedUsers.length : 0}</span>
-              <span class="flex items-center gap-0.5"><i data-lucide="message-square" class="w-3 h-3"></i> ${(p.comments || []).length}</span>
-            </div>
-          </div>
-        `).join('');
-      }
-      lucide.createIcons();
-    }
-
-    // Board Feed Generator
-    function renderBoardFeed(containerId, posts) {
-      const container = document.getElementById(containerId);
-      if (posts.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white rounded-2xl p-8 text-center text-slate-400 border border-slate-100">
-            <i data-lucide="message-square-off" class="w-10 h-10 mx-auto mb-2 opacity-50"></i>
-            <p class="text-sm">게시글이 없습니다. 첫 글을 등록해 보세요!</p>
-          </div>
-        `;
-        lucide.createIcons();
-        return;
+      for (let i = 0; i < firstDay; i++) {
+        grid.innerHTML += `<div class="h-20 bg-slate-900/30 rounded-2xl"></div>`;
       }
 
-      container.innerHTML = posts.map(post => {
-        const commentCount = (post.comments || []).length;
-        const likeCount = (post.likedUsers || []).length;
-        const isLikedByMe = currentUser && post.likedUsers && post.likedUsers.includes(currentUser.uid);
+      for (let day = 1; day <= lastDate; day++) {
+        const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const event = ACADEMIC_EVENTS[dateStr];
 
-        return `
-          <div onclick="window.openPostDetail('${post.id}')" class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition cursor-pointer relative">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-lg">${escapeHtml(post.author || '익명')}</span>
-              <div class="flex items-center gap-2">
-                <span class="text-[11px] text-slate-400">${post.dateStr || ''}</span>
-                ${currentAdminRole ? `<button onclick="event.stopPropagation(); window.triggerDeletePostPromptDirect('${post.id}')" class="text-rose-600 text-xs font-bold hover:bg-rose-50 px-2 py-0.5 rounded">삭제</button>` : ''}
-              </div>
-            </div>
-            <h3 class="font-bold text-base text-slate-800 mb-1.5">${escapeHtml(post.title)}</h3>
-            <p class="text-xs text-slate-600 line-clamp-2 mb-4 leading-relaxed">${escapeHtml(post.content)}</p>
-            <div class="flex items-center justify-between pt-3 border-t border-slate-50 text-xs text-slate-400">
-              <span class="flex items-center gap-1 ${isLikedByMe ? 'text-rose-500 font-bold' : ''}">
-                <i data-lucide="heart" class="w-3.5 h-3.5 ${isLikedByMe ? 'fill-current' : ''}"></i> 좋아요 ${likeCount}
-              </span>
-              <span class="flex items-center gap-1 text-slate-500">
-                <i data-lucide="message-square" class="w-3.5 h-3.5"></i> 댓글 ${commentCount}
-              </span>
-            </div>
+        let badgeHtml = '';
+        if (event) {
+          badgeHtml = `<span class="block mt-1 text-[9px] font-bold p-1 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 truncate">${event.title}</span>`;
+        }
+
+        grid.innerHTML += `
+          <div class="h-20 bg-slate-900/80 p-2 rounded-2xl border border-slate-800 flex flex-col justify-between">
+            <span class="text-xs font-bold text-slate-300">${day}</span>
+            <div class="overflow-hidden">${badgeHtml}</div>
           </div>
         `;
-      }).join('');
-
-      lucide.createIcons();
+      }
     }
 
-    // Open Detail Modal
+    window.changeCalendarMonth = (delta) => {
+      calendarMonth += delta;
+      if (calendarMonth > 12) { calendarMonth = 1; calendarYear++; }
+      else if (calendarMonth < 1) { calendarMonth = 12; calendarYear--; }
+      renderCalendar(calendarYear, calendarMonth);
+    };
+
     window.openPostDetail = (postId) => {
       activePostId = postId;
       const post = allPosts.find(p => p.id === postId);
@@ -1060,36 +1106,25 @@
       }
 
       const likedUsers = post.likedUsers || [];
-      const likesCount = likedUsers.length;
-      const isLiked = currentUser && likedUsers.includes(currentUser.uid);
+      document.getElementById('detail-likes-count').innerText = likedUsers.length;
 
-      document.getElementById('detail-likes-count').innerText = likesCount;
-
-      const likeBtn = document.getElementById('like-toggle-btn');
-      if (isLiked) {
-        likeBtn.className = "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition bg-rose-50 border border-rose-200 text-rose-600";
-      } else {
-        likeBtn.className = "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition border border-slate-200 text-slate-600 hover:bg-slate-50";
-      }
-
-      // Comments
       const comments = post.comments || [];
       document.getElementById('detail-comments-count').innerText = comments.length;
-      
+
       const commentList = document.getElementById('comment-list');
       if (comments.length === 0) {
-        commentList.innerHTML = `<p class="text-xs text-slate-400 py-3 text-center">아직 댓글이 없습니다. 첫 댓글을 남겨보세요!</p>`;
+        commentList.innerHTML = `<p class="text-xs text-slate-400 py-3 text-center">댓글이 없습니다. 첫 댓글을 남겨보세요!</p>`;
       } else {
         commentList.innerHTML = comments.map(c => `
-          <div class="bg-slate-50 p-3 rounded-xl text-xs border border-slate-100">
+          <div class="bg-slate-800/80 p-3 rounded-2xl text-xs border border-slate-700/60">
             <div class="flex justify-between items-center mb-1">
-              <span class="font-bold text-slate-700">${escapeHtml(c.author)}</span>
+              <span class="font-bold text-indigo-300">${escapeHtml(c.author)}</span>
               <div class="flex items-center gap-2">
-                <span class="text-[10px] text-slate-400">${c.dateStr || ''}</span>
-                ${currentAdminRole ? `<button onclick="window.triggerDeleteCommentPrompt('${c.id}')" class="text-rose-600 text-[10px] font-bold hover:underline">삭제</button>` : ''}
+                <span class="text-[10px] text-slate-500">${c.dateStr}</span>
+                ${currentAdminRole ? `<button onclick="triggerDeleteCommentPrompt('${c.id}')" class="text-rose-400 text-[10px] font-bold hover:underline">삭제</button>` : ''}
               </div>
             </div>
-            <p class="text-slate-600 whitespace-pre-line">${escapeHtml(c.text)}</p>
+            <p class="text-slate-200">${escapeHtml(c.text)}</p>
           </div>
         `).join('');
       }
@@ -1097,18 +1132,15 @@
       lucide.createIcons();
     }
 
-    /*
-      ==========================================================
-      🔔 [관리자 삭제 경고 및 confirmation 모달 로직]
-      ==========================================================
-    */
+    // Admin Delete Warnings
     window.triggerDeletePostPrompt = () => {
       if (!currentAdminRole || !activePostId) return;
       document.getElementById('delete-confirm-title').innerText = "이 게시글을 삭제하시겠습니까?";
-      document.getElementById('delete-confirm-desc').innerText = "삭제된 게시글 및 댓글은 영구적으로 복구할 수 없습니다.";
+      document.getElementById('delete-confirm-desc').innerText = "삭제된 데이터는 복구할 수 없습니다.";
 
-      pendingDeleteAction = async () => {
-        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'posts', activePostId));
+      pendingDeleteAction = () => {
+        allPosts = allPosts.filter(p => p.id !== activePostId);
+        saveData();
         closeDetailModal();
       };
 
@@ -1120,8 +1152,9 @@
       document.getElementById('delete-confirm-title').innerText = "선택한 게시글을 삭제하시겠습니까?";
       document.getElementById('delete-confirm-desc').innerText = "삭제된 데이터는 복구할 수 없습니다.";
 
-      pendingDeleteAction = async () => {
-        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'posts', postId));
+      pendingDeleteAction = () => {
+        allPosts = allPosts.filter(p => p.id !== postId);
+        saveData();
       };
 
       document.getElementById('delete-confirm-modal').classList.remove('hidden');
@@ -1132,20 +1165,20 @@
       document.getElementById('delete-confirm-title').innerText = "해당 댓글을 삭제하시겠습니까?";
       document.getElementById('delete-confirm-desc').innerText = "선택한 댓글이 삭제됩니다.";
 
-      pendingDeleteAction = async () => {
+      pendingDeleteAction = () => {
         const post = allPosts.find(p => p.id === activePostId);
-        if (!post) return;
-        const updatedComments = (post.comments || []).filter(c => c.id !== commentId);
-        const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'posts', activePostId);
-        await updateDoc(postRef, { comments: updatedComments });
+        if (post) {
+          post.comments = (post.comments || []).filter(c => c.id !== commentId);
+          saveData();
+        }
       };
 
       document.getElementById('delete-confirm-modal').classList.remove('hidden');
     };
 
-    document.getElementById('confirm-delete-action-btn').addEventListener('click', async () => {
+    document.getElementById('confirm-delete-action-btn').addEventListener('click', () => {
       if (pendingDeleteAction) {
-        await pendingDeleteAction();
+        pendingDeleteAction();
         pendingDeleteAction = null;
       }
       closeDeleteConfirmModal();
@@ -1156,141 +1189,139 @@
       pendingDeleteAction = null;
     };
 
-    // Single-Like Toggle
-    window.toggleLikeCurrentPost = async () => {
-      if (!currentUser || !activePostId) return;
-
+    window.toggleLikeCurrentPost = () => {
+      if (!activePostId) return;
       const post = allPosts.find(p => p.id === activePostId);
       if (!post) return;
 
-      let likedUsers = post.likedUsers || [];
-      const uid = currentUser.uid;
-
-      if (likedUsers.includes(uid)) {
-        likedUsers = likedUsers.filter(id => id !== uid);
+      if (!post.likedUsers) post.likedUsers = [];
+      if (post.likedUsers.includes(currentUserUid)) {
+        post.likedUsers = post.likedUsers.filter(id => id !== currentUserUid);
       } else {
-        likedUsers.push(uid);
+        post.likedUsers.push(currentUserUid);
       }
-
-      try {
-        const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'posts', activePostId);
-        await updateDoc(postRef, { likedUsers });
-      } catch (err) {
-        console.error("Toggle Like Error:", err);
-      }
+      saveData();
     };
 
-    // Comment Submission
-    window.handleCommentSubmit = async (e) => {
+    window.handleCommentSubmit = (e) => {
       e.preventDefault();
-      if (!currentUser || !activePostId) return;
+      if (!activePostId) return;
 
-      const commentInput = document.getElementById('comment-input');
-      const text = commentInput.value.trim();
+      const input = document.getElementById('comment-input');
+      const text = input.value.trim();
       if (!text) return;
 
       const post = allPosts.find(p => p.id === activePostId);
       if (!post) return;
 
-      const comments = post.comments || [];
+      if (!post.comments) post.comments = [];
+
       const now = new Date();
       const dateStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      let author = memberUser ? memberUser.name : '익명 학생';
+      if (currentAdminRole) author = `👑 ${currentAdminRole}`;
 
-      const commentAuthor = currentAdminRole ? `👑 ${currentAdminRole}` : '익명 학생';
-
-      comments.push({
-        id: crypto.randomUUID(),
-        author: commentAuthor,
+      post.comments.push({
+        id: 'c_' + Date.now(),
+        author,
         text,
-        dateStr,
-        uid: currentUser.uid
+        dateStr
       });
 
-      try {
-        const postRef = doc(db, 'artifacts', appId, 'public', 'data', 'posts', activePostId);
-        await updateDoc(postRef, { comments });
-        commentInput.value = '';
-      } catch (err) {
-        console.error("Add Comment Error:", err);
-      }
+      saveData();
+      input.value = '';
     };
 
-    // Close Modals
-    window.closeDetailModal = () => {
-      document.getElementById('detail-modal').classList.add('hidden');
-      activePostId = null;
-    };
-
-    window.openNoticeModal = (noticeId) => {
-      const notice = defaultNotices.find(n => n.id === noticeId);
-      if (!notice) return;
-
-      document.getElementById('notice-modal-tag').innerText = notice.tag;
-      document.getElementById('notice-modal-date').innerText = notice.date;
-      document.getElementById('notice-modal-title').innerText = notice.title;
-      document.getElementById('notice-modal-content').innerText = notice.content;
-
-      document.getElementById('notice-modal').classList.remove('hidden');
-    };
-
-    window.closeNoticeModal = () => {
-      document.getElementById('notice-modal').classList.add('hidden');
-    };
-
-    // Submit New Post
-    window.handlePostSubmit = async (e) => {
+    window.handlePostSubmit = (e) => {
       e.preventDefault();
-      if (!currentUser) return;
-
-      const submitBtn = document.getElementById('submit-btn');
-      submitBtn.disabled = true;
-      submitBtn.innerText = "등록 중...";
 
       const boardType = document.getElementById('post-board-type').value;
-      const title = document.getElementById('post-title').value;
-      let author = document.getElementById('post-author').value || '익명';
-      if (currentAdminRole) {
-        author = `👑 ${currentAdminRole}`;
-      }
-      const content = document.getElementById('post-content').value;
+      const title = document.getElementById('post-title').value.trim();
+      let author = document.getElementById('post-author').value.trim() || '익명 학생';
+      if (currentAdminRole) author = `👑 ${currentAdminRole}`;
+      else if (memberUser) author = memberUser.name;
+
+      const content = document.getElementById('post-content').value.trim();
 
       const now = new Date();
       const dateStr = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
 
-      try {
-        const postsCol = collection(db, 'artifacts', appId, 'public', 'data', 'posts');
-        await addDoc(postsCol, {
-          boardType,
-          title,
-          author,
-          content,
-          dateStr,
-          createdAt: Date.now(),
-          likedUsers: [],
-          comments: []
-        });
+      const newPost = {
+        id: 'post_' + Date.now(),
+        boardType,
+        title,
+        author,
+        content,
+        dateStr,
+        createdAt: Date.now(),
+        likedUsers: [],
+        comments: []
+      };
 
-        closePostModal();
-        document.getElementById('post-form').reset();
+      allPosts.unshift(newPost);
+      saveData();
 
-        if (boardType === '질문') switchTab('qna');
-        else if (boardType === '동아리') switchTab('club');
-        else if (boardType === '공지') switchTab('notice');
-        else switchTab('free');
+      closePostModal();
+      document.getElementById('post-form').reset();
 
-      } catch (err) {
-        console.error("Add Post Error:", err);
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = "등록하기";
+      if (boardType === '선생님칭찬') switchTab('teachers');
+      else if (boardType === '질문') switchTab('qna');
+      else if (boardType === '공지') switchTab('notice');
+      else switchTab('free');
+    };
+
+    window.handleMemberLogin = (e) => {
+      e.preventDefault();
+      const nameInput = document.getElementById('login-input-name').value.trim();
+      if (nameInput) {
+        memberUser = { name: nameInput };
+        localStorage.setItem('peniel_space_member', JSON.stringify(memberUser));
+        updateAuthUI();
       }
+      closeLoginModal();
     };
 
-    // Admin Modals
-    window.openAdminModal = () => {
-      document.getElementById('admin-login-modal').classList.remove('hidden');
+    window.logoutMember = () => {
+      memberUser = null;
+      localStorage.removeItem('peniel_space_member');
+      updateAuthUI();
+      switchTab('home');
     };
 
+    function renderMyPage() {
+      if (!memberUser) return;
+      document.getElementById('mypage-name-title').innerText = memberUser.name;
+
+      const myPosts = allPosts.filter(p => p.author === memberUser.name);
+      document.getElementById('mypage-post-count').innerText = `${myPosts.length}개`;
+
+      const listContainer = document.getElementById('mypage-activity-list');
+      if (myPosts.length === 0) {
+        listContainer.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">작성된 글이 없습니다.</p>`;
+      } else {
+        listContainer.innerHTML = myPosts.map(p => `
+          <div onclick="openPostDetail('${p.id}')" class="p-3 bg-slate-900/60 rounded-2xl border border-slate-800 cursor-pointer hover:border-indigo-500/50 flex justify-between items-center">
+            <span class="text-xs font-bold text-white truncate">${escapeHtml(p.title)}</span>
+            <span class="text-[10px] text-slate-400 shrink-0">${p.dateStr}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    // Modal Control Functions
+    window.closeDetailModal = () => document.getElementById('detail-modal').classList.add('hidden');
+    window.openNoticeModal = (id) => {
+      const n = defaultNotices.find(item => item.id === id);
+      if (!n) return;
+      document.getElementById('notice-modal-title').innerText = n.title;
+      document.getElementById('notice-modal-content').innerText = n.content;
+      document.getElementById('notice-modal').classList.remove('hidden');
+    };
+    window.closeNoticeModal = () => document.getElementById('notice-modal').classList.add('hidden');
+    window.openLoginModal = () => document.getElementById('login-modal').classList.remove('hidden');
+    window.closeLoginModal = () => document.getElementById('login-modal').classList.add('hidden');
+    
+    window.openAdminModal = () => document.getElementById('admin-login-modal').classList.remove('hidden');
     window.closeAdminModal = () => {
       document.getElementById('admin-login-modal').classList.add('hidden');
       document.getElementById('admin-login-error').classList.add('hidden');
@@ -1299,16 +1330,17 @@
     window.openAdminDashboard = () => {
       document.getElementById('dash-admin-name').innerText = currentAdminRole || '관리자';
       document.getElementById('dash-total-posts').innerText = allPosts.length;
-
       const totalComments = allPosts.reduce((acc, p) => acc + (p.comments || []).length, 0);
       document.getElementById('dash-total-comments').innerText = totalComments;
-
       document.getElementById('admin-dashboard-modal').classList.remove('hidden');
     };
+    window.closeAdminDashboard = () => document.getElementById('admin-dashboard-modal').classList.add('hidden');
 
-    window.closeAdminDashboard = () => {
-      document.getElementById('admin-dashboard-modal').classList.add('hidden');
+    window.openPostModal = (defaultBoard = '자유') => {
+      document.getElementById('post-board-type').value = defaultBoard;
+      document.getElementById('post-modal').classList.remove('hidden');
     };
+    window.closePostModal = () => document.getElementById('post-modal').classList.add('hidden');
 
     function escapeHtml(str) {
       if (!str) return '';
@@ -1316,33 +1348,25 @@
     }
   </script>
 
-  <!-- Navigation Functions -->
+  <!-- Navigation -->
   <script>
     function switchTab(tabName) {
-      const tabs = ['home', 'notice', 'free', 'qna', 'club', 'calendar', 'meal'];
+      const tabs = ['home', 'free', 'teachers', 'spaces', 'qna', 'calendar', 'meal', 'notice', 'mypage'];
       tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         const navBtn = document.getElementById(`nav-${t}`);
         if (t === tabName) {
-          el.classList.remove('hidden');
-          if (navBtn) navBtn.classList.add('bg-indigo-800', 'text-amber-300');
+          if (el) el.classList.remove('hidden');
+          if (navBtn) navBtn.classList.add('bg-indigo-900/60', 'text-amber-400', 'border-indigo-500/40');
         } else {
-          el.classList.add('hidden');
-          if (navBtn) navBtn.classList.remove('bg-indigo-800', 'text-amber-300');
+          if (el) el.classList.add('hidden');
+          if (navBtn) navBtn.classList.remove('bg-indigo-900/60', 'text-amber-400', 'border-indigo-500/40');
         }
       });
+
+      if (tabName === 'mypage') renderMyPage();
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function openPostModal(defaultBoard = '자유') {
-      document.getElementById('post-board-type').value = defaultBoard;
-      document.getElementById('post-modal').classList.remove('hidden');
-    }
-
-    function closePostModal() {
-      document.getElementById('post-modal').classList.add('hidden');
     }
   </script>
 </body>
 </html>
-
