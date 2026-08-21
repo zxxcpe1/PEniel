@@ -1379,3 +1379,80 @@
   </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>브니엘고등학교 학사일정</title>
+  <!-- 기존 스타일 및 CSS 코드... -->
+</head>
+<body>
+
+  <!-- 1. 학사일정 화면 레이아웃 (HTML) -->
+  <div class="schedule-container">
+    <h2>📅 브니엘고등학교 학사일정</h2>
+    <div class="schedule-nav">
+      <select id="semesterSelect" onchange="updateMonthOptions()">
+        <option value="1">1학기 (3월 ~ 8월)</option>
+        <option value="2">2학기 (9월 ~ 2월)</option>
+      </select>
+      <select id="monthSelect" onchange="renderSchedule()"></select>
+    </div>
+    <div id="scheduleList" class="schedule-list"></div>
+  </div>
+
+
+  <!-- =================================================== -->
+  <!-- 2번 코드가 들어가는 위치: body 태그가 닫히기 직전 -->
+  <!-- =================================================== -->
+
+  <!-- (1) 데이터 파일 불러오기 -->
+  <script src="scheduleData.js"></script>
+
+  <!-- (2) 화면 동작 자바스크립트 코드 -->
+  <script>
+    function updateMonthOptions() {
+      const semester = document.getElementById("semesterSelect").value;
+      const monthSelect = document.getElementById("monthSelect");
+      monthSelect.innerHTML = "";
+
+      const months = Object.keys(scheduleData[semester]);
+      months.forEach(month => {
+        const option = document.createElement("option");
+        option.value = month;
+        option.textContent = month;
+        monthSelect.appendChild(option);
+      });
+
+      renderSchedule();
+    }
+
+    function renderSchedule() {
+      const semester = document.getElementById("semesterSelect").value;
+      const month = document.getElementById("monthSelect").value;
+      const scheduleList = document.getElementById("scheduleList");
+      
+      scheduleList.innerHTML = "";
+      const events = scheduleData[semester][month] || [];
+
+      if (events.length === 0) {
+        scheduleList.innerHTML = "<div class='schedule-item'>등록된 주요 일정이 없습니다.</div>";
+        return;
+      }
+
+      events.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "schedule-item";
+        row.innerHTML = `
+          <span class="schedule-date">${item.date}</span>
+          <span class="schedule-event ${item.highlight ? 'highlight-event' : ''}">${item.event}</span>
+        `;
+        scheduleList.appendChild(row);
+      });
+    }
+
+    updateMonthOptions();
+  </script>
+
+</body>
+</html>
