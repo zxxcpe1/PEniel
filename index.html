@@ -1,573 +1,880 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>브니엘고 익명 아지트 & 정보 Hub</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome 아이콘 -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-        body { font-family: 'Pretendard', sans-serif; }
-        .glass { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); }
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>브니엘고등학교 학생 스페이스</title>
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700;800&display=swap');
+    body { font-family: 'Pretendard', sans-serif; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+  </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
 
-    <!-- 1. 상단 헤더 & 브랜드 (스쿨허브 -> 브니엘고 Hub) -->
-    <header class="glass border-b border-slate-700/60 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50">
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
-            <span class="text-3xl">⛪</span>
-            <div>
-                <h1 class="font-extrabold text-2xl tracking-tight bg-gradient-to-r from-blue-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">브니엘고 Hub</h1>
-                <p class="text-[11px] text-slate-400 font-medium">Peniel High School Anonymous & Info Hub</p>
+  <!-- Admin Top Banner -->
+  <div id="admin-top-banner" class="bg-amber-500 text-slate-950 px-4 py-2 text-xs font-bold flex justify-between items-center hidden shadow-md">
+    <div class="flex items-center gap-2">
+      <i data-lucide="shield-check" class="w-4 h-4"></i>
+      <span>관리자 모드로 접속중입니다. 모든 게시글 및 댓글 삭제 권한이 활성화되었습니다.</span>
+    </div>
+    <button onclick="logoutAdmin()" class="bg-slate-950 text-white px-2.5 py-1 rounded-lg text-[11px] hover:bg-slate-800 transition">
+      관리자 로그아웃
+    </button>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 shadow-xl">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('home')">
+        <div class="w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center font-black text-xl text-white shadow-lg shadow-indigo-500/30">
+          P
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-base tracking-tight text-white">브니엘고 커뮤니티</h1>
+            <span id="admin-indicator" class="hidden bg-amber-400 text-slate-950 text-[10px] font-black px-1.5 py-0.5 rounded">ADMIN</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Peniel High School Student Space</p>
+        </div>
+      </div>
+
+      <!-- Auth Controls -->
+      <div class="flex items-center gap-2">
+        <div id="user-status-guest" class="flex items-center gap-2">
+          <button onclick="openLoginModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-xl font-bold transition border border-slate-700">
+            학생 로그인
+          </button>
+          <button id="admin-login-btn" onclick="openAdminModal()" class="text-xs bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 px-3 py-2 rounded-xl font-bold transition border border-amber-500/30">
+            관리자
+          </button>
+        </div>
+
+        <div id="user-status-member" class="hidden flex items-center gap-2">
+          <button onclick="switchTab('mypage')" class="flex items-center gap-2 bg-indigo-950/60 border border-indigo-500/30 px-3 py-1.5 rounded-xl hover:bg-indigo-900/50 transition">
+            <div class="w-6 h-6 bg-indigo-500 rounded-lg flex items-center justify-center text-xs font-bold text-white">
+              <i data-lucide="user" class="w-3.5 h-3.5"></i>
             </div>
+            <span id="user-profile-name" class="text-xs font-bold text-slate-200">학생</span>
+          </button>
+          <button onclick="logoutMember()" class="text-xs text-slate-400 hover:text-white p-2">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
         </div>
-        <div class="flex items-center space-x-3">
-            <span id="userBadge" class="text-xs bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-full text-slate-300">
-                👤 익명 학생
-            </span>
-            <button onclick="toggleAdminModal()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-1.5 rounded-lg font-medium transition">
-                <i class="fa-solid fa-lock mr-1.5"></i>관리자 인증
-            </button>
-        </div>
-    </header>
+      </div>
+    </div>
 
-    <!-- 2. 상단 네비게이션 카테고리 바 (옆이 아닌 위로 이동) -->
-    <nav class="bg-slate-800/90 border-b border-slate-700/60 sticky top-[73px] z-40 backdrop-blur-md shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 flex items-center gap-2 overflow-x-auto hide-scrollbar py-2.5">
-            <button onclick="switchTab('home', this)" class="nav-tab-btn whitespace-nowrap flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition text-blue-400 bg-slate-700/80">
-                <i class="fa-solid fa-house"></i><span>홈</span>
-            </button>
-            <button onclick="switchTab('meal', this)" class="nav-tab-btn whitespace-nowrap flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-700/50">
-                <i class="fa-solid fa-utensils text-amber-400"></i><span>오늘의 급식</span>
-            </button>
-            <button onclick="switchTab('calendar', this)" class="nav-tab-btn whitespace-nowrap flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-700/50">
-                <i class="fa-solid fa-calendar-days text-emerald-400"></i><span>학사 일정</span>
-            </button>
-            <button onclick="switchTab('free', this)" class="nav-tab-btn whitespace-nowrap flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-700/50">
-                <i class="fa-solid fa-comments text-sky-400"></i><span>익명 자유게시판</span>
-            </button>
-            <button onclick="switchTab('qna', this)" class="nav-tab-btn whitespace-nowrap flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-700/50">
-                <i class="fa-solid fa-circle-question text-teal-400"></i><span>익명 Q&A</span>
-            </button>
-            <button onclick="switchTab('teachers', this)" class="nav-tab-btn whitespace-nowrap flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-700/50">
-                <i class="fa-solid fa-user-tie text-purple-400"></i><span>선생님 정보</span>
-            </button>
-            <button onclick="switchTab('spaces', this)" class="nav-tab-btn whitespace-nowrap flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-700/50">
-                <i class="fa-solid fa-map-location-dot text-rose-400"></i><span>학교 공간 지도</span>
-            </button>
-            <button onclick="switchTab('clubs', this)" class="nav-tab-btn whitespace-nowrap flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-700/50">
-                <i class="fa-solid fa-users text-amber-400"></i><span>동아리 위키</span>
-            </button>
-            <button onclick="switchTab('lost', this)" class="nav-tab-btn whitespace-nowrap flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-700/50">
-                <i class="fa-solid fa-box-open text-cyan-400"></i><span>분실물 센터</span>
-            </button>
-        </div>
+    <!-- Navigation -->
+    <nav class="border-t border-slate-800/60 bg-slate-950/50 overflow-x-auto custom-scrollbar">
+      <div class="max-w-6xl mx-auto px-4 flex gap-1 py-2 text-xs font-bold whitespace-nowrap">
+        <button id="nav-home" onclick="switchTab('home')" class="px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 text-amber-400 bg-indigo-900/60 border border-indigo-500/40 shadow">
+          <i data-lucide="home" class="w-3.5 h-3.5"></i> 홈
+        </button>
+        <button id="nav-free" onclick="switchTab('free')" class="px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-800/50">
+          <i data-lucide="messages-square" class="w-3.5 h-3.5"></i> 자유게시판
+        </button>
+        <button id="nav-teachers" onclick="switchTab('teachers')" class="px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-800/50">
+          <i data-lucide="heart" class="w-3.5 h-3.5"></i> 선생님 칭찬
+        </button>
+        <button id="nav-qna" onclick="switchTab('qna')" class="px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-800/50">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5"></i> 질문게시판
+        </button>
+        <button id="nav-meal" onclick="switchTab('meal')" class="px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-800/50">
+          <i data-lucide="utensils" class="w-3.5 h-3.5"></i> 급식표 (NEIS API)
+        </button>
+        <button id="nav-calendar" onclick="switchTab('calendar')" class="px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-800/50">
+          <i data-lucide="calendar" class="w-3.5 h-3.5"></i> 학사일정 (NEIS API)
+        </button>
+        <button id="nav-notice" onclick="switchTab('notice')" class="px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-800/50">
+          <i data-lucide="megaphone" class="w-3.5 h-3.5"></i> 공지사항
+        </button>
+      </div>
     </nav>
+  </header>
 
-    <!-- 메인 컨테이너 -->
-    <div class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6">
-        <main class="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6 min-h-[650px] shadow-2xl">
+  <!-- Main Content Container -->
+  <main class="max-w-6xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
 
-            <!-- TAB 1: 홈 메인 대시보드 -->
-            <section id="view-home" class="space-y-6">
-                <!-- 하이라이트 배너 -->
-                <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 p-6 md:p-8 text-white shadow-xl">
-                    <span class="bg-white/20 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Peniel High School</span>
-                    <h2 class="text-2xl md:text-3xl font-extrabold mt-3 mb-2">⛪ 브니엘고 학생들을 위한 정보 & 익명 Hub</h2>
-                    <p class="text-blue-100 text-sm md:text-base">리로스쿨의 딱딱함을 벗어던진 학생 중심 공간! 급식 메뉴부터 시험 일정, 동아리 꿀팁까지 한번에 확인하세요.</p>
-                </div>
-
-                <!-- 핵심 정보 4분할 요약 그리드 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <!-- 오늘 급식 -->
-                    <div class="bg-slate-800 border border-amber-500/30 rounded-xl p-4 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="font-bold text-amber-400 text-sm flex items-center gap-1.5"><i class="fa-solid fa-utensils"></i> 오늘 중식 (브니엘고)</h3>
-                                <button onclick="switchTab('meal')" class="text-[11px] text-slate-400 hover:text-white">더보기 →</button>
-                            </div>
-                            <ul id="homeMealList" class="text-xs text-slate-300 space-y-1"></ul>
-                        </div>
-                    </div>
-
-                    <!-- 주요 학사일정 -->
-                    <div class="bg-slate-800 border border-emerald-500/30 rounded-xl p-4 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="font-bold text-emerald-400 text-sm flex items-center gap-1.5"><i class="fa-solid fa-calendar"></i> 다가오는 일정</h3>
-                                <button onclick="switchTab('calendar')" class="text-[11px] text-slate-400 hover:text-white">더보기 →</button>
-                            </div>
-                            <div id="homeCalendarList" class="space-y-2"></div>
-                        </div>
-                    </div>
-
-                    <!-- 분실물 센터 -->
-                    <div class="bg-slate-800 border border-cyan-500/30 rounded-xl p-4 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="font-bold text-cyan-400 text-sm flex items-center gap-1.5"><i class="fa-solid fa-box-open"></i> 최근 분실물</h3>
-                                <button onclick="switchTab('lost')" class="text-[11px] text-slate-400 hover:text-white">더보기 →</button>
-                            </div>
-                            <div id="homeLostList" class="space-y-1.5 text-xs text-slate-300"></div>
-                        </div>
-                    </div>
-
-                    <!-- 동아리 꿀팁 -->
-                    <div class="bg-slate-800 border border-indigo-500/30 rounded-xl p-4 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="font-bold text-indigo-400 text-sm flex items-center gap-1.5"><i class="fa-solid fa-award"></i> 동아리 꿀팁</h3>
-                                <button onclick="switchTab('clubs')" class="text-[11px] text-slate-400 hover:text-white">더보기 →</button>
-                            </div>
-                            <div id="homeClubList" class="space-y-1.5 text-xs text-slate-300"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 실시간 자유게시판 인기글 -->
-                <div class="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-slate-100 flex items-center gap-2"><i class="fa-solid fa-fire text-rose-500"></i> 실시간 익명 인기글</h3>
-                        <button onclick="switchTab('free')" class="text-xs text-slate-400 hover:text-white">자유게시판 가기 →</button>
-                    </div>
-                    <div id="homeFreePosts" class="space-y-3"></div>
-                </div>
-            </section>
-
-            <!-- TAB 2: 오늘의 급식 -->
-            <section id="view-meal" class="hidden space-y-6">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-100"><i class="fa-solid fa-utensils text-amber-400 mr-2"></i>브니엘고 식단표</h2>
-                        <p class="text-xs text-slate-400 mt-1">오늘의 중식/석식 메뉴와 영양 정보입니다.</p>
-                    </div>
-                    <button id="adminMealBtn" onclick="openAdminAdd('meal')" class="hidden bg-amber-600 hover:bg-amber-500 text-white text-xs px-3 py-1.5 rounded-lg transition">식단 수정 (관리자)</button>
-                </div>
-                <div id="mealGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-            </section>
-
-            <!-- TAB 3: 학사 일정 -->
-            <section id="view-calendar" class="hidden space-y-6">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-100"><i class="fa-solid fa-calendar-days text-emerald-400 mr-2"></i>브니엘고 주요 학사 일정</h2>
-                        <p class="text-xs text-slate-400 mt-1">시험기간, 방학, 축제 일정을 미리 확인하세요.</p>
-                    </div>
-                    <button id="adminCalendarBtn" onclick="openAdminAdd('calendar')" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-lg transition">일정 추가 (관리자)</button>
-                </div>
-                <div id="calendarList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            </section>
-
-            <!-- TAB 4: 익명 자유게시판 -->
-            <section id="view-free" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-slate-100"><i class="fa-solid fa-comments text-sky-400 mr-2"></i>익명 자유게시판</h2>
-                    <button onclick="openPostModal('free')" class="bg-sky-600 hover:bg-sky-500 text-white text-sm px-4 py-2 rounded-xl transition">글쓰기</button>
-                </div>
-                <div id="freePostList" class="space-y-3"></div>
-            </section>
-
-            <!-- TAB 5: 익명 Q&A -->
-            <section id="view-qna" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-slate-100"><i class="fa-solid fa-circle-question text-teal-400 mr-2"></i>익명 Q&A</h2>
-                    <button onclick="openPostModal('qna')" class="bg-teal-600 hover:bg-teal-500 text-white text-sm px-4 py-2 rounded-xl transition">질문하기</button>
-                </div>
-                <div id="qnaPostList" class="space-y-3"></div>
-            </section>
-
-            <!-- TAB 6: 선생님 정보 (관리자) -->
-            <section id="view-teachers" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-slate-100"><i class="fa-solid fa-user-tie text-purple-400 mr-2"></i>선생님 정보</h2>
-                    <button id="adminTeacherBtn" onclick="openAdminAdd('teacher')" class="hidden bg-purple-600 hover:bg-purple-500 text-white text-sm px-3 py-1.5 rounded-lg transition">선생님 추가 (관리자)</button>
-                </div>
-                <div id="teacherGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </section>
-
-            <!-- TAB 7: 학교 공간 설명 (사진 포함 / 관리자) -->
-            <section id="view-spaces" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-slate-100"><i class="fa-solid fa-map-location-dot text-rose-400 mr-2"></i>학교 공간 가이드</h2>
-                    <button id="adminSpaceBtn" onclick="openAdminAdd('space')" class="hidden bg-rose-600 hover:bg-rose-500 text-white text-sm px-3 py-1.5 rounded-lg transition">공간 추가 (관리자)</button>
-                </div>
-                <div id="spaceGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </section>
-
-            <!-- TAB 8: 동아리 정보 (선배 경험 / 관리자) -->
-            <section id="view-clubs" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-slate-100"><i class="fa-solid fa-users text-amber-400 mr-2"></i>동아리 선배들의 꿀팁 DB</h2>
-                    <button id="adminClubBtn" onclick="openAdminAdd('club')" class="hidden bg-amber-600 hover:bg-amber-500 text-white text-sm px-3 py-1.5 rounded-lg transition">동아리 추가 (관리자)</button>
-                </div>
-                <div id="clubGrid" class="space-y-4"></div>
-            </section>
-
-            <!-- TAB 9: 분실물 정보 -->
-            <section id="view-lost" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-slate-100"><i class="fa-solid fa-box-open text-cyan-400 mr-2"></i>분실물 센터</h2>
-                    <button onclick="openPostModal('lost')" class="bg-cyan-600 hover:bg-cyan-500 text-white text-sm px-4 py-2 rounded-xl transition">분실물 등록</button>
-                </div>
-                <div id="lostGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-            </section>
-
-        </main>
-    </div>
-
-    <!-- 관리자 인증 모달 -->
-    <div id="adminModal" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl w-full max-w-md space-y-4">
-            <h3 class="text-lg font-bold text-white">🔒 브니엘고 관리자 인증</h3>
-            <p class="text-xs text-slate-400">초기 관리자 비밀번호: <code class="bg-slate-700 px-1.5 py-0.5 rounded text-amber-300">admin1234</code></p>
-            <input type="password" id="adminPasswordInput" placeholder="비밀번호 입력" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-indigo-500">
-            <div class="flex justify-end gap-2">
-                <button onclick="toggleAdminModal()" class="px-4 py-2 text-sm text-slate-400 hover:text-white">취소</button>
-                <button onclick="verifyAdmin()" class="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl">인증하기</button>
-            </div>
+    <!-- TAB: HOME -->
+    <div id="tab-home" class="space-y-6">
+      <!-- Banner -->
+      <div class="relative overflow-hidden bg-gradient-to-r from-indigo-900 via-indigo-950 to-slate-900 border border-indigo-500/30 rounded-3xl p-6 shadow-2xl">
+        <div class="relative z-10 space-y-2 max-w-xl">
+          <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+            Official Peniel Hub
+          </span>
+          <h2 class="text-2xl font-extrabold text-white leading-tight">브니엘고등학교 학생들을 위한 자유로운 소통 공간</h2>
+          <p class="text-xs text-slate-300">급식 정보와 학사일정은 나이스(NEIS) 교육행정정보시스템과 실시간 연동됩니다.</p>
         </div>
-    </div>
+      </div>
 
-    <!-- 게시글 작성 모달 -->
-    <div id="postModal" class="fixed inset-0 bg-black/75 hidden items-center justify-center p-4 z-50">
-        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl w-full max-w-md space-y-4">
-            <h3 id="postModalTitle" class="text-lg font-bold text-white">글 작성</h3>
-            <input type="text" id="postTitleInput" placeholder="제목" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-blue-500">
-            <textarea id="postContentInput" rows="4" placeholder="내용을 입력하세요..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-blue-500"></textarea>
-            <div id="lostExtraInputs" class="hidden space-y-2">
-                <input type="text" id="lostLocationInput" placeholder="습득 장소 (예: 본관 2층 복도)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none">
-                <input type="text" id="lostImgInput" placeholder="이미지 URL (선택)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none">
+      <!-- Quick Meal & Schedule Widget Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Today Meal Summary -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 shadow-lg space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-2">
+              <i data-lucide="utensils" class="w-4 h-4 text-amber-400"></i>
+              <h3 class="font-extrabold text-sm text-white">오늘의 급식</h3>
             </div>
-            <div class="flex justify-end gap-2">
-                <button onclick="closePostModal()" class="px-4 py-2 text-sm text-slate-400 hover:text-white">취소</button>
-                <button onclick="submitPost()" class="px-4 py-2 text-sm bg-blue-600 hover:bg-blue-500 text-white rounded-xl">등록하기</button>
-            </div>
+            <button onclick="switchTab('meal')" class="text-[11px] text-slate-400 hover:text-amber-400">자세히 보기 →</button>
+          </div>
+          <div id="home-meal-content" class="text-xs text-slate-300 leading-relaxed min-h-[80px] flex items-center justify-center">
+            <span class="text-slate-500">급식 데이터를 불러오는 중...</span>
+          </div>
         </div>
+
+        <!-- Upcoming Events Summary -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 shadow-lg space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-2">
+              <i data-lucide="calendar" class="w-4 h-4 text-indigo-400"></i>
+              <h3 class="font-extrabold text-sm text-white">이달의 주요 학사일정</h3>
+            </div>
+            <button onclick="switchTab('calendar')" class="text-[11px] text-slate-400 hover:text-indigo-400">달력 보기 →</button>
+          </div>
+          <div id="home-schedule-content" class="space-y-1.5 min-h-[80px]">
+            <span class="text-xs text-slate-500 flex items-center justify-center h-full">학사일정을 불러오는 중...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Feeds Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-extrabold text-base text-white flex items-center gap-2">
+              <i data-lucide="flame" class="w-4 h-4 text-rose-500"></i> 최신 게시글
+            </h3>
+            <button onclick="openPostModal('자유')" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition shadow">
+              글쓰기
+            </button>
+          </div>
+          <div id="home-free-feed" class="space-y-2"></div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="font-extrabold text-base text-white flex items-center gap-2">
+            <i data-lucide="heart" class="w-4 h-4 text-rose-400"></i> 선생님 칭찬
+          </h3>
+          <div id="home-teacher-feed" class="space-y-2"></div>
+        </div>
+      </div>
     </div>
 
-    <script>
-        // 관리자 상태 관리
-        let isAdmin = false;
-        const ADMIN_PW = "admin1234";
-        let activePostType = 'free';
+    <!-- TAB: MEAL -->
+    <div id="tab-meal" class="hidden space-y-6">
+      <div class="flex items-center justify-between bg-slate-900 p-6 rounded-3xl border border-slate-800">
+        <div>
+          <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
+            <i data-lucide="utensils" class="w-5 h-5 text-amber-400"></i> 실시간 급식 정보
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">나이스 Open API를 통해 제공되는 브니엘고등학교 식단 정보입니다.</p>
+        </div>
+        <input type="date" id="meal-date-picker" onchange="loadMealDataByDate(this.value)" class="bg-slate-800 border border-slate-700 text-xs text-white p-2.5 rounded-xl focus:outline-none focus:border-indigo-500">
+      </div>
 
-        // 브니엘고 데이터베이스
-        let penielDb = {
-            meals: [
-                {
-                    type: "오늘의 중식",
-                    date: "2026-08-24 (월)",
-                    items: ["혼합잡곡밥", "돈육김치찌개", "수제 찰핫도그", "치즈닭갈비", "깍두기", "청포도 에이드"],
-                    calories: "840 kcal",
-                    img: "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=500&q=80"
-                },
-                {
-                    type: "오늘의 석식",
-                    date: "2026-08-24 (월)",
-                    items: ["쌀밥", "우동국물", "치킨마요덮밥", "야채튀김", "배추김치", "요구르트"],
-                    calories: "790 kcal",
-                    img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80"
-                }
-            ],
-            calendar: [
-                { title: "2학기 개학식", date: "8월 18일(화)", tag: "학사일정", style: "bg-blue-900/40 text-blue-300 border-blue-700/50" },
-                { title: "2학기 1차 지필평가 (중간고사)", date: "10월 12일(월) ~ 10월 15일(목)", tag: "시험", style: "bg-rose-900/40 text-rose-300 border-rose-700/50" },
-                { title: "브니엘 예술제 & 동아리 발표회", date: "11월 06일(금)", tag: "행사", style: "bg-amber-900/40 text-amber-300 border-amber-700/50" },
-                { title: "2027학년도 대학수학능력시험", date: "11월 19일(목)", tag: "수능", style: "bg-purple-900/40 text-purple-300 border-purple-700/50" }
-            ],
-            free: [
-                { id: 1, title: "오늘 급식 수제 핫도그 나온대 ㅋㅋㅋ", content: "청포도 에이드까지 완성도 미쳤다 기대중!!", time: "10분 전" },
-                { id: 2, title: "시험범위 프린트 잃어버린 사람?", content: "본관 2층 교무실 앞 복도에 떨어져있었음!", time: "1시간 전" }
-            ],
-            qna: [
-                { id: 1, title: "정보 수행평가 질문있습니다", content: "깃허브 블로그 배포할 때 404 오류 떠요 ㅠㅠ 해결법 알려주실 분?", time: "30분 전" }
-            ],
-            teachers: [
-                { name: "김철수 선생님", subject: "수학", room: "2학년 교무실", tip: "질문하러 갈 때 개념서 풀이 먼저 보여드리면 완전 친절하게 설명해주심!" },
-                { name: "이영희 선생님", subject: "영어", room: "3학년 교무실", tip: "단어 테스트 재시험 기준 엄격하시니까 미리 단어장 다 외우고 가기." }
-            ],
-            spaces: [
-                { name: "도서관 (꿈터)", desc: "시험기간 독서실 대용으로 최적. 창가 자리가 햇살 잘 들어오고 분위기 좋음.", img: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=500&q=80" },
-                { name: "중앙 잔디밭 & 벤치", desc: "점심시간 산책 1위 코스. 버스킹 동아리 공연 때 구경하기 딱 좋은 위치.", img: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=500&q=80" }
-            ],
-            clubs: [
-                { name: "컴퓨터 동아리 (ALGO)", desc: "알고리즘 문제 풀이 및 웹사이트 제작 프로젝트 진행.", tip: "선배 팁: 면접 때 본인이 직접 코딩해본 경험을 어필하면 가산점 있음!" }
-            ],
-            lost: [
-                { item: "검은색 에어팟 프로 2세대", location: "체육관 2층 관람석 3번째 줄", date: "2026-08-24", img: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=500&q=80" }
-            ]
-        };
+      <div id="meal-detail-card" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <span id="meal-date-title" class="font-bold text-sm text-amber-400">날짜를 불러오는 중...</span>
+          <span class="text-[11px] bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full">중식</span>
+        </div>
+        <div id="meal-menu-list" class="text-sm text-slate-200 leading-relaxed min-h-[120px] whitespace-pre-line">
+          급식 데이터를 불러오는 중입니다...
+        </div>
+        <div class="bg-slate-950/60 p-3 rounded-2xl border border-slate-800 text-[11px] text-slate-400">
+          * 요리명 뒤의 숫자는 알레르기 유발물질 정보 번호입니다.
+        </div>
+      </div>
+    </div>
 
-        // 탭 전환 함수
-        function switchTab(tabId, el) {
-            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
-            const targetSec = document.getElementById(`view-${tabId}`);
-            if (targetSec) targetSec.classList.remove('hidden');
+    <!-- TAB: CALENDAR -->
+    <div id="tab-calendar" class="hidden space-y-6">
+      <div class="flex items-center justify-between bg-slate-900 p-6 rounded-3xl border border-slate-800">
+        <div>
+          <h2 class="text-lg font-extrabold text-white flex items-center gap-2">
+            <i data-lucide="calendar" class="w-5 h-5 text-indigo-400"></i> 실시간 학사일정
+          </h2>
+          <p class="text-xs text-slate-400 mt-1">교육청 나이스 데이터베이스 연동 학사일정입니다.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="changeCalendarMonth(-1)" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-300">◀ 이전달</button>
+          <span id="calendar-month-title" class="text-sm font-extrabold text-white px-2">2026년 8월</span>
+          <button onclick="changeCalendarMonth(1)" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-300">다음달 ▶</button>
+        </div>
+      </div>
 
-            document.querySelectorAll('.nav-tab-btn').forEach(btn => {
-                btn.classList.remove('text-blue-400', 'bg-slate-700/80');
-                btn.classList.add('text-slate-300');
-            });
+      <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-400 pb-2">
+        <div class="text-rose-400">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-indigo-400">토</div>
+      </div>
+      <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
+    </div>
 
-            if (el) {
-                el.classList.remove('text-slate-300');
-                el.classList.add('text-blue-400', 'bg-slate-700/80');
+    <!-- TAB: FREE BOARD -->
+    <div id="tab-free" class="hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-extrabold text-white">자유게시판</h2>
+        <button onclick="openPostModal('자유')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-lg">
+          새 글 작성
+        </button>
+      </div>
+      <div id="posts-container-free" class="space-y-4"></div>
+    </div>
+
+    <!-- TAB: TEACHERS BOARD -->
+    <div id="tab-teachers" class="hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-extrabold text-white">선생님 칭찬게시판</h2>
+        <button onclick="openPostModal('선생님칭찬')" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-lg">
+          칭찬글 작성
+        </button>
+      </div>
+      <div id="posts-container-teachers" class="space-y-4"></div>
+    </div>
+
+    <!-- TAB: QNA BOARD -->
+    <div id="tab-qna" class="hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-extrabold text-white">질문게시판</h2>
+        <button onclick="openPostModal('질문')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-lg">
+          질문하기
+        </button>
+      </div>
+      <div id="posts-container-qna" class="space-y-4"></div>
+    </div>
+
+    <!-- TAB: NOTICE -->
+    <div id="tab-notice" class="hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-extrabold text-white">공지사항</h2>
+        <button id="admin-notice-btn" onclick="openPostModal('공지')" class="hidden bg-amber-500 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition shadow-lg">
+          공지 등록
+        </button>
+      </div>
+      <div id="notice-full-list" class="space-y-4"></div>
+    </div>
+
+    <!-- TAB: MYPAGE -->
+    <div id="tab-mypage" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4">
+        <div class="flex items-center gap-4 border-b border-slate-800 pb-4">
+          <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold">
+            <i data-lucide="user" class="w-8 h-8"></i>
+          </div>
+          <div>
+            <h2 id="mypage-name-title" class="text-lg font-extrabold text-white">학생</h2>
+            <p class="text-xs text-slate-400">브니엘고등학교 재학생</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div class="bg-slate-800/60 p-3 rounded-2xl">
+            <p class="text-[10px] text-slate-400 font-bold">작성 글</p>
+            <p id="mypage-post-count" class="text-base font-extrabold text-indigo-400">0개</p>
+          </div>
+          <div class="bg-slate-800/60 p-3 rounded-2xl">
+            <p class="text-[10px] text-slate-400 font-bold">작성 댓글</p>
+            <p id="mypage-comment-count" class="text-base font-extrabold text-indigo-400">0개</p>
+          </div>
+          <div class="bg-slate-800/60 p-3 rounded-2xl">
+            <p class="text-[10px] text-slate-400 font-bold">받은 좋아요</p>
+            <p id="mypage-like-count" class="text-base font-extrabold text-rose-400">0개</p>
+          </div>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <h3 class="font-extrabold text-sm text-white">내 활동 내역</h3>
+        <div id="mypage-activity-list" class="space-y-2"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Login Modal -->
+  <div id="login-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-sm w-full shadow-2xl overflow-hidden">
+      <div class="p-6 text-center space-y-2 border-b border-slate-800">
+        <h3 class="font-extrabold text-base text-white">학생 로그인</h3>
+        <p class="text-xs text-slate-400">학년 반 이름 또는 닉네임을 입력하세요.</p>
+      </div>
+      <form onsubmit="handleMemberLogin(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">닉네임 / 이름</label>
+          <input type="text" id="login-input-name" required placeholder="예: 2학년 3반 홍길동" class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-indigo-500">
+        </div>
+        <div class="space-y-2 pt-2">
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-3 rounded-2xl text-xs transition shadow-lg">
+            로그인하기
+          </button>
+          <button type="button" onclick="closeLoginModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-2xl text-xs transition border border-slate-700">
+            취소
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Login Modal -->
+  <div id="admin-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-sm w-full shadow-2xl overflow-hidden">
+      <div class="p-6 text-center space-y-2 border-b border-slate-800">
+        <div class="w-12 h-12 bg-amber-500 text-slate-950 rounded-2xl flex items-center justify-center mx-auto mb-2 font-bold shadow-lg">
+          <i data-lucide="shield-alert" class="w-6 h-6"></i>
+        </div>
+        <h3 class="font-extrabold text-base text-white">관리자 인증</h3>
+        <p class="text-xs text-slate-400">게시글 관리 권한용 비밀번호를 입력하세요.</p>
+      </div>
+      <form onsubmit="handleAdminLogin(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">관리자 비밀번호</label>
+          <input type="password" id="admin-password-input" placeholder="비밀번호 입력" class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-amber-400">
+        </div>
+        <div class="space-y-2 pt-2">
+          <button type="submit" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold py-3 rounded-2xl text-xs transition shadow-lg">
+            관리자 로그인
+          </button>
+          <button type="button" onclick="closeAdminModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-2xl text-xs transition border border-slate-700">
+            취소
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Post Create Modal -->
+  <div id="post-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full shadow-2xl overflow-hidden">
+      <div class="p-6 border-b border-slate-800 flex items-center justify-between">
+        <h3 id="post-modal-title" class="font-extrabold text-base text-white">글 작성하기</h3>
+        <button onclick="closePostModal()" class="text-slate-400 hover:text-white">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <form onsubmit="handlePostSubmit(event)" class="p-6 space-y-4">
+        <input type="hidden" id="post-category-input">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">제목</label>
+          <input type="text" id="post-title-input" required placeholder="제목을 입력하세요" class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-indigo-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">내용</label>
+          <textarea id="post-content-input" rows="5" required placeholder="내용을 작성하세요..." class="w-full bg-slate-800 border border-slate-700 rounded-2xl p-3 text-xs text-white focus:outline-none focus:border-indigo-500 custom-scrollbar"></textarea>
+        </div>
+        <div class="pt-2 flex gap-3">
+          <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold py-3 rounded-2xl text-xs transition shadow-lg">
+            등록하기
+          </button>
+          <button type="button" onclick="closePostModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-5 py-3 rounded-2xl text-xs transition border border-slate-700">
+            취소
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-800/80 bg-slate-950/80 py-8 text-center text-slate-500 text-xs">
+    <div class="max-w-6xl mx-auto px-4 space-y-2">
+      <p class="font-bold text-slate-400">브니엘고등학교 학생 전용 커뮤니티 스페이스</p>
+      <p class="text-[11px]">본 서비스는 교육청 NEIS Open API 공공 데이터를 연동하여 정제된 급식/학사 정보를 제공합니다.</p>
+    </div>
+  </footer>
+
+  <!-- Script Implementation -->
+  <script>
+    // NEIS API Configuration
+    const NEIS_CONFIG = {
+      OFFICE_CODE: 'C10',     // 부산광역시교육청
+      SCHOOL_CODE: '7150117'  // 브니엘고등학교
+    };
+
+    // State Management
+    let state = {
+      isAdmin: false,
+      currentUser: null,
+      currentTab: 'home',
+      currentCalYear: 2026,
+      currentCalMonth: 8, // 1-indexed (8 = August)
+      monthlySchedule: {},
+      posts: [
+        {
+          id: 1,
+          category: '공지',
+          title: 'NEIS API 연동 안내 및 소통 공간 수칙',
+          content: '급식표 및 학사일정이 교육청 데이터베이스와 실시간 연동됩니다. 학생 여러분의 건전한 소통 환경 조성을 부탁드립니다.',
+          author: '학생회',
+          date: '2026.08.24',
+          likes: 30,
+          comments: []
+        },
+        {
+          id: 2,
+          category: '자유',
+          title: '오늘 급식 메뉴 어떤가요?',
+          content: 'NEIS 연동된 급식표 확인해보니 오늘 메뉴 정말 맛있어 보이네요!',
+          author: '익명',
+          date: '2026.08.24',
+          likes: 8,
+          comments: []
+        }
+      ]
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      
+      // Initialize Date Picker Default to Today
+      const today = new Date();
+      const dateStr = today.toISOString().split('T')[0];
+      const picker = document.getElementById('meal-date-picker');
+      if (picker) picker.value = dateStr;
+
+      // Initial Data Fetching from NEIS API
+      fetchTodayMeal();
+      fetchAcademicCalendar(state.currentCalYear, state.currentCalMonth);
+      renderAll();
+    });
+
+    // NEIS API Functions
+    async function fetchTodayMeal() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const ymd = `${yyyy}${mm}${dd}`;
+
+      await loadMealDataByYmd(ymd, `${yyyy}.${mm}.${dd}`);
+    }
+
+    async function loadMealDataByDate(dateVal) {
+      if (!dateVal) return;
+      const [yyyy, mm, dd] = dateVal.split('-');
+      await loadMealDataByYmd(`${yyyy}${mm}${dd}`, `${yyyy}.${mm}.${dd}`);
+    }
+
+    async function loadMealDataByYmd(ymd, displayDate) {
+      const homeMealEl = document.getElementById('home-meal-content');
+      const mealTitleEl = document.getElementById('meal-date-title');
+      const mealMenuEl = document.getElementById('meal-menu-list');
+
+      if (mealTitleEl) mealTitleEl.textContent = `${displayDate} 식단안내`;
+
+      const url = `https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&ATPT_OFCDC_SC_CODE=${NEIS_CONFIG.OFFICE_CODE}&SD_SCHUL_CODE=${NEIS_CONFIG.SCHOOL_CODE}&MLSV_YMD=${ymd}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.mealServiceDietInfo && data.mealServiceDietInfo[1].row) {
+          const rawMenu = data.mealServiceDietInfo[1].row[0].DDISH_NM;
+          const cleanMenu = rawMenu.replace(/<br\/>/g, '\n');
+          
+          if (homeMealEl) homeMealEl.innerHTML = `<p class="whitespace-pre-line">${cleanMenu}</p>`;
+          if (mealMenuEl) mealMenuEl.textContent = cleanMenu;
+        } else {
+          const noDataMsg = '해당 날짜에 등록된 급식 정보가 없습니다. (휴업일 또는 주말)';
+          if (homeMealEl) homeMealEl.innerHTML = `<span class="text-slate-500">${noDataMsg}</span>`;
+          if (mealMenuEl) mealMenuEl.textContent = noDataMsg;
+        }
+      } catch (err) {
+        console.error('급식 로드 실패:', err);
+        if (homeMealEl) homeMealEl.textContent = '급식 정보를 불러올 수 없습니다.';
+        if (mealMenuEl) mealMenuEl.textContent = '급식 정보를 불러오는 중 오류가 발생했습니다.';
+      }
+    }
+
+    async function fetchAcademicCalendar(year, month) {
+      const yyyymm = `${year}${String(month).padStart(2, '0')}`;
+      const url = `https://open.neis.go.kr/hub/SchoolSchedule?Type=json&ATPT_OFCDC_SC_CODE=${NEIS_CONFIG.OFFICE_CODE}&SD_SCHUL_CODE=${NEIS_CONFIG.SCHOOL_CODE}&AA_YMD=${yyyymm}`;
+
+      state.monthlySchedule = {};
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.SchoolSchedule && data.SchoolSchedule[1].row) {
+          data.SchoolSchedule[1].row.forEach(item => {
+            if (item.EVENT_NM && item.EVENT_NM !== '토요휴업일') {
+              state.monthlySchedule[item.AA_YMD] = item.EVENT_NM;
             }
-
-            renderAll();
+          });
         }
+      } catch (err) {
+        console.error('학사일정 로드 실패:', err);
+      }
 
-        // 관리자 인증
-        function toggleAdminModal() {
-            const modal = document.getElementById('adminModal');
-            modal.classList.toggle('hidden');
-            modal.classList.toggle('flex');
+      renderCalendarGrid();
+      renderHomeScheduleSnippet();
+    }
+
+    function renderCalendarGrid() {
+      const grid = document.getElementById('calendar-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const year = state.currentCalYear;
+      const month = state.currentCalMonth;
+      
+      const firstDay = new Date(year, month - 1, 1).getDay();
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const todayStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+
+      // Blank slots
+      for (let i = 0; i < firstDay; i++) {
+        const emptySlot = document.createElement('div');
+        emptySlot.className = 'min-h-[70px] bg-slate-950/30 border border-slate-900 rounded-2xl';
+        grid.appendChild(emptySlot);
+      }
+
+      // Day slots
+      for (let d = 1; d <= daysInMonth; d++) {
+        const ymd = `${year}${String(month).padStart(2, '0')}${String(d).padStart(2, '0')}`;
+        const eventName = state.monthlySchedule[ymd];
+        const isToday = ymd === todayStr;
+
+        const dayCard = document.createElement('div');
+        dayCard.className = `min-h-[75px] bg-slate-900/80 border ${isToday ? 'border-amber-400 bg-amber-400/10' : 'border-slate-800'} rounded-2xl p-2 text-xs flex flex-col justify-between`;
+
+        dayCard.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="font-bold ${isToday ? 'text-amber-400 font-black' : 'text-slate-300'}">${d}</span>
+            ${isToday ? '<span class="text-[9px] bg-amber-400 text-slate-950 px-1 rounded font-bold">TODAY</span>' : ''}
+          </div>
+          ${eventName ? `<span class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 p-1 rounded font-bold truncate" title="${eventName}">${eventName}</span>` : ''}
+        `;
+        grid.appendChild(dayCard);
+      }
+    }
+
+    function renderHomeScheduleSnippet() {
+      const container = document.getElementById('home-schedule-content');
+      if (!container) return;
+
+      const events = Object.entries(state.monthlySchedule);
+      if (events.length === 0) {
+        container.innerHTML = '<span class="text-xs text-slate-500 flex items-center justify-center h-full">이번 달 등록된 학사일정이 없습니다.</span>';
+        return;
+      }
+
+      container.innerHTML = events.slice(0, 3).map(([ymd, name]) => {
+        const day = ymd.substring(6, 8);
+        return `
+          <div class="flex items-center justify-between bg-slate-950/50 p-2 rounded-xl border border-slate-800 text-xs">
+            <span class="font-bold text-indigo-400">${Number(day)}일</span>
+            <span class="text-slate-200 font-semibold truncate max-w-[80%]">${name}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function changeCalendarMonth(delta) {
+      state.currentCalMonth += delta;
+      if (state.currentCalMonth < 1) {
+        state.currentCalMonth = 12;
+        state.currentCalYear--;
+      } else if (state.currentCalMonth > 12) {
+        state.currentCalMonth = 1;
+        state.currentCalYear++;
+      }
+
+      document.getElementById('calendar-month-title').textContent = `${state.currentCalYear}년 ${state.currentCalMonth}월`;
+      fetchAcademicCalendar(state.currentCalYear, state.currentCalMonth);
+    }
+
+    // Navigation and UI Switch
+    function switchTab(tabId) {
+      state.currentTab = tabId;
+      const tabs = ['home', 'free', 'teachers', 'qna', 'meal', 'calendar', 'notice', 'mypage'];
+      
+      tabs.forEach(t => {
+        const el = document.getElementById(`tab-${t}`);
+        const navEl = document.getElementById(`nav-${t}`);
+        if (el) el.classList.toggle('hidden', t !== tabId);
+        if (navEl) {
+          navEl.className = t === tabId 
+            ? 'px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 text-amber-400 bg-indigo-900/60 border border-indigo-500/40 shadow'
+            : 'px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-slate-800/50';
         }
+      });
 
-        function verifyAdmin() {
-            const pw = document.getElementById('adminPasswordInput').value;
-            if (pw === ADMIN_PW) {
-                isAdmin = true;
-                document.getElementById('userBadge').innerHTML = '👑 <span class="text-amber-400 font-bold">브니엘고 관리자</span>';
-                ['adminTeacherBtn', 'adminSpaceBtn', 'adminClubBtn', 'adminMealBtn', 'adminCalendarBtn'].forEach(id => {
-                    const btn = document.getElementById(id);
-                    if (btn) btn.classList.remove('hidden');
-                });
-                alert('브니엘고 관리자로 인증되었습니다.');
-                toggleAdminModal();
-                renderAll();
-            } else {
-                alert('비밀번호가 올바르지 않습니다.');
-            }
-        }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-        // 모달 제어
-        function openPostModal(type) {
-            activePostType = type;
-            const modal = document.getElementById('postModal');
-            const lostInputs = document.getElementById('lostExtraInputs');
-            document.getElementById('postTitleInput').value = '';
-            document.getElementById('postContentInput').value = '';
+    // Modal Operations
+    function openLoginModal() { document.getElementById('login-modal').classList.remove('hidden'); }
+    function closeLoginModal() { document.getElementById('login-modal').classList.add('hidden'); }
+    function openAdminModal() { document.getElementById('admin-modal').classList.remove('hidden'); }
+    function closeAdminModal() { document.getElementById('admin-modal').classList.add('hidden'); }
 
-            if (type === 'lost') {
-                document.getElementById('postModalTitle').innerText = "분실물 등록";
-                lostInputs.classList.remove('hidden');
-            } else {
-                document.getElementById('postModalTitle').innerText = type === 'free' ? "익명 글쓰기" : "익명 질문하기";
-                lostInputs.classList.add('hidden');
-            }
+    function openPostModal(category) {
+      document.getElementById('post-category-input').value = category;
+      document.getElementById('post-modal-title').textContent = `${category} 글 작성하기`;
+      document.getElementById('post-modal').classList.remove('hidden');
+    }
+    function closePostModal() {
+      document.getElementById('post-modal').classList.add('hidden');
+      document.getElementById('post-title-input').value = '';
+      document.getElementById('post-content-input').value = '';
+    }
 
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
+    // Authentication Handlers
+    function handleMemberLogin(e) {
+      e.preventDefault();
+      const val = document.getElementById('login-input-name').value.trim();
+      state.currentUser = val || '학생';
+      
+      document.getElementById('user-status-guest').classList.add('hidden');
+      document.getElementById('user-status-member').classList.remove('hidden');
+      document.getElementById('user-profile-name').textContent = state.currentUser;
+      document.getElementById('mypage-name-title').textContent = state.currentUser;
+      
+      closeLoginModal();
+      renderAll();
+    }
 
-        function closePostModal() {
-            const modal = document.getElementById('postModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
+    function logoutMember() {
+      state.currentUser = null;
+      document.getElementById('user-status-guest').classList.remove('hidden');
+      document.getElementById('user-status-member').classList.add('hidden');
+      if (state.currentTab === 'mypage') switchTab('home');
+      renderAll();
+    }
 
-        function submitPost() {
-            const title = document.getElementById('postTitleInput').value.trim();
-            const content = document.getElementById('postContentInput').value.trim();
-
-            if (!title || !content) {
-                alert('제목과 내용을 모두 입력해주세요.');
-                return;
-            }
-
-            if (activePostType === 'lost') {
-                const location = document.getElementById('lostLocationInput').value || '위치 미기재';
-                const img = document.getElementById('lostImgInput').value || 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=500&q=80';
-                penielDb.lost.unshift({ item: title, location: location, date: "방금 전", img: img });
-            } else if (activePostType === 'free') {
-                penielDb.free.unshift({ id: Date.now(), title, content, time: "방금 전" });
-            } else if (activePostType === 'qna') {
-                penielDb.qna.unshift({ id: Date.now(), title, content, time: "방금 전" });
-            }
-
-            closePostModal();
-            renderAll();
-        }
-
-        function openAdminAdd(category) {
-            if (!isAdmin) return;
-
-            if (category === 'teacher') {
-                const name = prompt("선생님 성함:");
-                const subject = prompt("담당 과목:");
-                const room = prompt("교무실 위치:");
-                const tip = prompt("선생님 팁:");
-                if (name && subject) penielDb.teachers.push({ name, subject, room, tip });
-            } else if (category === 'space') {
-                const name = prompt("공간 이름:");
-                const desc = prompt("공간 설명:");
-                const img = prompt("이미지 URL:") || "https://images.unsplash.com/photo-1562774053-701939374585?w=500&q=80";
-                if (name && desc) penielDb.spaces.push({ name, desc, img });
-            } else if (category === 'club') {
-                const name = prompt("동아리명:");
-                const desc = prompt("소개:");
-                const tip = prompt("선배의 팁:");
-                if (name && desc) penielDb.clubs.push({ name, desc, tip });
-            } else if (category === 'calendar') {
-                const title = prompt("학사일정명:");
-                const date = prompt("날짜:");
-                const tag = prompt("태그:") || "일정";
-                if (title && date) penielDb.calendar.push({ title, date, tag, style: "bg-blue-900/40 text-blue-300 border-blue-700/50" });
-            }
-            renderAll();
-        }
-
-        // 전체 UI 데이터 렌더링
-        function renderAll() {
-            // 1. 급식
-            document.getElementById('mealGrid').innerHTML = penielDb.meals.map(m => `
-                <div class="bg-slate-800 border border-slate-700/60 rounded-xl overflow-hidden flex flex-col md:flex-row">
-                    <img src="${m.img}" class="h-44 md:h-auto md:w-2/5 object-cover" alt="">
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-0.5 rounded-full">${m.type}</span>
-                                <span class="text-xs text-slate-400">${m.date}</span>
-                            </div>
-                            <ul class="text-sm text-slate-200 space-y-1 mb-3">
-                                ${m.items.map(item => `<li class="flex items-center gap-1.5"><span class="text-amber-400">•</span> ${item}</li>`).join('')}
-                            </ul>
-                        </div>
-                        <div class="text-xs text-slate-400 border-t border-slate-700/50 pt-2 flex justify-between">
-                            <span>🔥 열량: ${m.calories}</span>
-                            <span>🏫 브니엘고 급식실</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-
-            // 2. 학사 일정
-            document.getElementById('calendarList').innerHTML = penielDb.calendar.map(c => `
-                <div class="bg-slate-800 border border-slate-700/60 p-4 rounded-xl flex flex-col justify-between space-y-3">
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs px-2.5 py-0.5 rounded-full border ${c.style}">${c.tag}</span>
-                            <i class="fa-regular fa-calendar text-slate-500"></i>
-                        </div>
-                        <h4 class="font-bold text-slate-100 text-base mb-1">${c.title}</h4>
-                        <p class="text-xs text-emerald-400 font-medium">📅 ${c.date}</p>
-                    </div>
-                </div>
-            `).join('');
-
-            // 3. 자유게시판
-            document.getElementById('freePostList').innerHTML = penielDb.free.map(p => `
-                <div class="bg-slate-800 border border-slate-700/60 p-4 rounded-xl">
-                    <div class="flex justify-between items-start mb-1">
-                        <h4 class="font-bold text-slate-200">${p.title}</h4>
-                        <span class="text-xs text-slate-500">${p.time}</span>
-                    </div>
-                    <p class="text-sm text-slate-400">${p.content}</p>
-                    <div class="mt-2 text-xs text-slate-500">✍️ 익명 학생</div>
-                </div>
-            `).join('');
-
-            // 4. Q&A
-            document.getElementById('qnaPostList').innerHTML = penielDb.qna.map(p => `
-                <div class="bg-slate-800 border border-slate-700/60 p-4 rounded-xl">
-                    <div class="flex justify-between items-start mb-1">
-                        <h4 class="font-bold text-slate-200">${p.title}</h4>
-                        <span class="text-xs text-slate-500">${p.time}</span>
-                    </div>
-                    <p class="text-sm text-slate-400">${p.content}</p>
-                    <div class="mt-2 text-xs text-teal-400">❓ 답변 대기중...</div>
-                </div>
-            `).join('');
-
-            // 5. 선생님 정보
-            document.getElementById('teacherGrid').innerHTML = penielDb.teachers.map(t => `
-                <div class="bg-slate-800 border border-slate-700/60 p-4 rounded-xl">
-                    <div class="flex justify-between items-center mb-2">
-                        <h4 class="font-bold text-lg text-purple-300">${t.name}</h4>
-                        <span class="text-xs bg-purple-900/50 text-purple-300 px-2 py-1 rounded">${t.subject}</span>
-                    </div>
-                    <p class="text-xs text-slate-400 mb-2">📍 위치: ${t.room}</p>
-                    <div class="bg-slate-900/50 p-2.5 rounded-lg text-xs text-slate-300 border border-slate-700/40">
-                        💡 <strong>꿀팁:</strong> ${t.tip}
-                    </div>
-                </div>
-            `).join('');
-
-            // 6. 학교 공간
-            document.getElementById('spaceGrid').innerHTML = penielDb.spaces.map(s => `
-                <div class="bg-slate-800 border border-slate-700/60 rounded-xl overflow-hidden flex flex-col">
-                    <img src="${s.img}" class="h-40 w-full object-cover" alt="">
-                    <div class="p-4">
-                        <h4 class="font-bold text-slate-200 mb-1">${s.name}</h4>
-                        <p class="text-xs text-slate-400">${s.desc}</p>
-                    </div>
-                </div>
-            `).join('');
-
-            // 7. 동아리
-            document.getElementById('clubGrid').innerHTML = penielDb.clubs.map(c => `
-                <div class="bg-slate-800 border border-slate-700/60 p-5 rounded-xl">
-                    <h3 class="font-bold text-lg text-amber-400 mb-1">${c.name}</h3>
-                    <p class="text-sm text-slate-300 mb-3">${c.desc}</p>
-                    <div class="bg-amber-950/30 border border-amber-800/40 p-3 rounded-xl text-xs text-amber-200/90">
-                        🎓 <strong>선배들의 경험담 & 팁:</strong> ${c.tip}
-                    </div>
-                </div>
-            `).join('');
-
-            // 8. 분실물
-            document.getElementById('lostGrid').innerHTML = penielDb.lost.map(l => `
-                <div class="bg-slate-800 border border-slate-700/60 rounded-xl overflow-hidden">
-                    <img src="${l.img}" class="h-32 w-full object-cover" alt="">
-                    <div class="p-3">
-                        <h4 class="font-bold text-slate-200 text-sm">${l.item}</h4>
-                        <p class="text-xs text-slate-400">📍 습득장소: ${l.location}</p>
-                        <p class="text-xs text-slate-500">📅 날짜: ${l.date}</p>
-                    </div>
-                </div>
-            `).join('');
-
-            // 대시보드 미리보기 대치
-            const todayLunch = penielDb.meals[0];
-            if (todayLunch) {
-                document.getElementById('homeMealList').innerHTML = todayLunch.items.slice(0, 4).map(i => `<li>• ${i}</li>`).join('') + `<li class="text-amber-400 font-medium pt-1">+ 더보기</li>`;
-            }
-
-            document.getElementById('homeCalendarList').innerHTML = penielDb.calendar.slice(0, 2).map(c => `
-                <div class="border-l-2 border-emerald-400 pl-2">
-                    <div class="font-bold text-slate-200 text-xs">${c.title}</div>
-                    <div class="text-[10px] text-slate-400">${c.date}</div>
-                </div>
-            `).join('');
-
-            document.getElementById('homeLostList').innerHTML = penielDb.lost.slice(0, 2).map(l => 
-                `<div class="truncate">📍 ${l.item}</div>`
-            ).join('');
-
-            document.getElementById('homeClubList').innerHTML = penielDb.clubs.slice(0, 2).map(c => 
-                `<div class="truncate">🌟 ${c.name}</div>`
-            ).join('');
-
-            document.getElementById('homeFreePosts').innerHTML = penielDb.free.slice(0, 3).map(p => `
-                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700/40 flex justify-between items-center cursor-pointer hover:border-slate-600" onclick="switchTab('free')">
-                    <div>
-                        <h4 class="text-sm font-semibold text-slate-200">${p.title}</h4>
-                        <p class="text-xs text-slate-400 line-clamp-1">${p.content}</p>
-                    </div>
-                    <span class="text-[10px] text-slate-500 whitespace-nowrap ml-2">${p.time}</span>
-                </div>
-            `).join('');
-        }
-
-        // 초기화 실행
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const pwd = document.getElementById('admin-password-input').value;
+      if (pwd === 'admin' || pwd === '1234') {
+        state.isAdmin = true;
+        document.getElementById('admin-top-banner').classList.remove('hidden');
+        document.getElementById('admin-indicator').classList.remove('hidden');
+        document.getElementById('admin-login-btn').classList.add('hidden');
+        document.getElementById('admin-notice-btn').classList.remove('hidden');
+        closeAdminModal();
         renderAll();
-    </script>
+      } else {
+        alert('비밀번호가 일치하지 않습니다.');
+      }
+    }
+
+    function logoutAdmin() {
+      state.isAdmin = false;
+      document.getElementById('admin-top-banner').classList.add('hidden');
+      document.getElementById('admin-indicator').classList.add('hidden');
+      document.getElementById('admin-login-btn').classList.remove('hidden');
+      document.getElementById('admin-notice-btn').classList.add('hidden');
+      renderAll();
+    }
+
+    // Post & Comment System
+    function handlePostSubmit(e) {
+      e.preventDefault();
+      const category = document.getElementById('post-category-input').value;
+      const title = document.getElementById('post-title-input').value.trim();
+      const content = document.getElementById('post-content-input').value.trim();
+
+      const newPost = {
+        id: Date.now(),
+        category: category,
+        title: title,
+        content: content,
+        author: category === '공지' ? '관리자' : (state.currentUser || '익명'),
+        date: '2026.08.24',
+        likes: 0,
+        comments: []
+      };
+
+      state.posts.unshift(newPost);
+      closePostModal();
+      renderAll();
+    }
+
+    function toggleLike(postId) {
+      const post = state.posts.find(p => p.id === postId);
+      if (post) {
+        post.likes++;
+        renderAll();
+      }
+    }
+
+    function addComment(postId, inputId) {
+      const input = document.getElementById(inputId);
+      const text = input.value.trim();
+      if (!text) return;
+
+      const post = state.posts.find(p => p.id === postId);
+      if (post) {
+        post.comments.push({
+          id: Date.now(),
+          author: state.currentUser || '익명',
+          text: text,
+          date: '2026.08.24'
+        });
+        input.value = '';
+        renderAll();
+      }
+    }
+
+    function deletePost(postId) {
+      if (confirm('이 게시글을 삭제하시겠습니까?')) {
+        state.posts = state.posts.filter(p => p.id !== postId);
+        renderAll();
+      }
+    }
+
+    function deleteComment(postId, commentId) {
+      if (confirm('댓글을 삭제하시겠습니까?')) {
+        const post = state.posts.find(p => p.id === postId);
+        if (post) {
+          post.comments = post.comments.filter(c => c.id !== commentId);
+          renderAll();
+        }
+      }
+    }
+
+    // Global Render Function
+    function renderAll() {
+      // Home Board Feeds
+      const homeFree = document.getElementById('home-free-feed');
+      if (homeFree) {
+        const freePosts = state.posts.filter(p => p.category === '자유').slice(0, 3);
+        homeFree.innerHTML = freePosts.map(p => `
+          <div onclick="switchTab('free')" class="p-3.5 bg-slate-900/60 hover:bg-slate-900 rounded-2xl border border-slate-700/50 cursor-pointer transition flex items-center justify-between">
+            <div class="space-y-1 max-w-[80%]">
+              <h4 class="font-bold text-xs text-slate-100 truncate">${p.title}</h4>
+              <p class="text-[11px] text-slate-400 truncate">${p.content}</p>
+            </div>
+            <div class="flex items-center gap-3 text-xs text-slate-400">
+              <span class="flex items-center gap-1 text-rose-400"><i data-lucide="heart" class="w-3.5 h-3.5"></i> ${p.likes}</span>
+              <span class="flex items-center gap-1 text-indigo-400"><i data-lucide="message-square" class="w-3.5 h-3.5"></i> ${p.comments.length}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      const homeTeacher = document.getElementById('home-teacher-feed');
+      if (homeTeacher) {
+        const teacherPosts = state.posts.filter(p => p.category === '선생님칭찬').slice(0, 2);
+        homeTeacher.innerHTML = teacherPosts.map(p => `
+          <div class="p-3.5 bg-rose-950/20 border border-rose-500/20 rounded-2xl space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded-full font-bold">감사 마음</span>
+              <span class="text-[10px] text-slate-400">${p.date}</span>
+            </div>
+            <h4 class="font-bold text-xs text-white line-clamp-1">${p.title}</h4>
+            <p class="text-[11px] text-slate-300 line-clamp-2">${p.content}</p>
+          </div>
+        `).join('');
+      }
+
+      renderBoard('자유', 'posts-container-free');
+      renderBoard('선생님칭찬', 'posts-container-teachers');
+      renderBoard('질문', 'posts-container-qna');
+      renderBoard('공지', 'notice-full-list');
+
+      // Sync MyPage
+      if (state.currentUser) {
+        const myPosts = state.posts.filter(p => p.author === state.currentUser);
+        let myCommentCount = 0;
+        let myLikeCount = 0;
+
+        state.posts.forEach(p => {
+          if (p.author === state.currentUser) myLikeCount += p.likes;
+          p.comments.forEach(c => {
+            if (c.author === state.currentUser) myCommentCount++;
+          });
+        });
+
+        document.getElementById('mypage-post-count').textContent = `${myPosts.length}개`;
+        document.getElementById('mypage-comment-count').textContent = `${myCommentCount}개`;
+        document.getElementById('mypage-like-count').textContent = `${myLikeCount}개`;
+
+        const activityContainer = document.getElementById('mypage-activity-list');
+        if (activityContainer) {
+          activityContainer.innerHTML = myPosts.length === 0
+            ? '<p class="text-xs text-slate-500 py-4 text-center">작성한 활동 내역이 없습니다.</p>'
+            : myPosts.map(p => `
+              <div class="p-3 bg-slate-900/60 rounded-2xl border border-slate-700/60 flex items-center justify-between text-xs">
+                <span class="font-bold text-slate-200 truncate max-w-[70%]">[${p.category}] ${p.title}</span>
+                <span class="text-slate-400 text-[10px]">${p.date}</span>
+              </div>
+            `).join('');
+        }
+      }
+
+      lucide.createIcons();
+    }
+
+    function renderBoard(category, containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      const items = state.posts.filter(p => p.category === category);
+      if (items.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-xs text-slate-500 bg-slate-900/40 rounded-3xl border border-slate-800">등록된 게시물이 없습니다.</div>`;
+        return;
+      }
+
+      container.innerHTML = items.map(post => `
+        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2.5 py-0.5 rounded-full">${post.author}</span>
+              <span class="text-[11px] text-slate-400">${post.date}</span>
+            </div>
+            ${state.isAdmin ? `
+              <button onclick="deletePost(${post.id})" class="text-xs bg-rose-500/20 text-rose-300 hover:bg-rose-500 hover:text-white px-2.5 py-1 rounded-lg border border-rose-500/30 transition font-bold flex items-center gap-1">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> 삭제
+              </button>
+            ` : ''}
+          </div>
+
+          <div>
+            <h3 class="text-base font-extrabold text-white mb-2">${post.title}</h3>
+            <p class="text-xs text-slate-300 leading-relaxed whitespace-pre-line">${post.content}</p>
+          </div>
+
+          <div class="flex items-center gap-3 pt-2">
+            <button onclick="toggleLike(${post.id})" class="bg-slate-950 hover:bg-slate-800 text-rose-400 border border-slate-800 px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
+              <i data-lucide="heart" class="w-3.5 h-3.5 fill-current"></i> 좋아요 ${post.likes}
+            </button>
+            <span class="text-xs text-slate-400 flex items-center gap-1">
+              <i data-lucide="message-square" class="w-3.5 h-3.5 text-indigo-400"></i> 댓글 ${post.comments.length}
+            </span>
+          </div>
+
+          <!-- Comments -->
+          <div class="bg-slate-950/80 rounded-2xl p-4 border border-slate-800 space-y-3">
+            <div class="space-y-2">
+              ${post.comments.map(c => `
+                <div class="flex items-start justify-between text-xs bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+                  <div class="space-y-0.5">
+                    <div class="flex items-center gap-2">
+                      <span class="font-bold text-amber-300 text-[11px]">${c.author}</span>
+                      <span class="text-[10px] text-slate-500">${c.date}</span>
+                    </div>
+                    <p class="text-slate-200 text-xs">${c.text}</p>
+                  </div>
+                  ${state.isAdmin ? `
+                    <button onclick="deleteComment(${post.id}, ${c.id})" class="text-rose-400 text-[10px] font-bold p-1">삭제</button>
+                  ` : ''}
+                </div>
+              `).join('')}
+            </div>
+
+            <div class="flex gap-2 pt-1">
+              <input type="text" id="comment-input-${post.id}" placeholder="댓글을 작성해보세요..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <button onclick="addComment(${post.id}, 'comment-input-${post.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition shadow shrink-0">
+                등록
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+  </script>
 </body>
 </html>
-
