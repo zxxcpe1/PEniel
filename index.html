@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>브니엘고 익명 아지트 & 정보 Hub</title>
+    <title>브니엘고 익명 아지트 & 정보</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome 아이콘 -->
@@ -17,13 +17,13 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
 
-    <!-- 1. 상단 헤더 & 브랜드 (스쿨허브 -> 브니엘고 Hub) -->
+    <!-- 1. 상단 헤더 & 브랜드 -->
     <header class="glass border-b border-slate-700/60 text-white px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
             <span class="text-3xl">⛪</span>
             <div>
-                <h1 class="font-extrabold text-2xl tracking-tight bg-gradient-to-r from-blue-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">브니엘고 Hub</h1>
-                <p class="text-[11px] text-slate-400 font-medium">Peniel High School Anonymous & Info Hub</p>
+                <h1 class="font-extrabold text-2xl tracking-tight bg-gradient-to-r from-blue-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">브니엘고</h1>
+                <p class="text-[11px] text-slate-400 font-medium">Peniel High School Anonymous & Info</p>
             </div>
         </div>
         <div class="flex items-center space-x-3">
@@ -54,15 +54,6 @@
             <button onclick="switchTab('qna', this)" class="nav-tab-btn whitespace-nowrap flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-700/50">
                 <i class="fa-solid fa-circle-question text-teal-400"></i><span>익명 Q&A</span>
             </button>
-            <button onclick="switchTab('teachers', this)" class="nav-tab-btn whitespace-nowrap flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-700/50">
-                <i class="fa-solid fa-user-tie text-purple-400"></i><span>선생님 정보</span>
-            </button>
-            <button onclick="switchTab('spaces', this)" class="nav-tab-btn whitespace-nowrap flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-700/50">
-                <i class="fa-solid fa-map-location-dot text-rose-400"></i><span>학교 공간 지도</span>
-            </button>
-            <button onclick="switchTab('clubs', this)" class="nav-tab-btn whitespace-nowrap flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-700/50">
-                <i class="fa-solid fa-users text-amber-400"></i><span>동아리 위키</span>
-            </button>
             <button onclick="switchTab('lost', this)" class="nav-tab-btn whitespace-nowrap flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-semibold transition text-slate-300 hover:bg-slate-700/50">
                 <i class="fa-solid fa-box-open text-cyan-400"></i><span>분실물 센터</span>
             </button>
@@ -78,12 +69,12 @@
                 <!-- 하이라이트 배너 -->
                 <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-800 p-6 md:p-8 text-white shadow-xl">
                     <span class="bg-white/20 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Peniel High School</span>
-                    <h2 class="text-2xl md:text-3xl font-extrabold mt-3 mb-2">⛪ 브니엘고 학생들을 위한 정보 & 익명 Hub</h2>
-                    <p class="text-blue-100 text-sm md:text-base">리로스쿨의 딱딱함을 벗어던진 학생 중심 공간! 급식 메뉴부터 시험 일정, 동아리 꿀팁까지 한번에 확인하세요.</p>
+                    <h2 class="text-2xl md:text-3xl font-extrabold mt-3 mb-2">⛪ 브니엘고 학생들을 위한 정보 & 익명 공간</h2>
+                    <p class="text-blue-100 text-sm md:text-base">리로스쿨의 딱딱함을 벗어던진 학생 중심 공간! 급식 메뉴부터 시험 일정, 분실물까지 한번에 확인하세요.</p>
                 </div>
 
-                <!-- 핵심 정보 4분할 요약 그리드 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- 핵심 정보 요약 그리드 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <!-- 오늘 급식 -->
                     <div class="bg-slate-800 border border-amber-500/30 rounded-xl p-4 flex flex-col justify-between">
                         <div>
@@ -117,16 +108,6 @@
                         </div>
                     </div>
 
-                    <!-- 동아리 꿀팁 -->
-                    <div class="bg-slate-800 border border-indigo-500/30 rounded-xl p-4 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="font-bold text-indigo-400 text-sm flex items-center gap-1.5"><i class="fa-solid fa-award"></i> 동아리 꿀팁</h3>
-                                <button onclick="switchTab('clubs')" class="text-[11px] text-slate-400 hover:text-white">더보기 →</button>
-                            </div>
-                            <div id="homeClubList" class="space-y-1.5 text-xs text-slate-300"></div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- 실시간 자유게시판 인기글 -->
@@ -196,34 +177,7 @@
                 <div id="qnaPostList" class="space-y-3"></div>
             </section>
 
-            <!-- TAB 6: 선생님 정보 (관리자) -->
-            <section id="view-teachers" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-slate-100"><i class="fa-solid fa-user-tie text-purple-400 mr-2"></i>선생님 정보</h2>
-                    <button id="adminTeacherBtn" onclick="openAdminAdd('teacher')" class="hidden bg-purple-600 hover:bg-purple-500 text-white text-sm px-3 py-1.5 rounded-lg transition">선생님 추가 (관리자)</button>
-                </div>
-                <div id="teacherGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </section>
-
-            <!-- TAB 7: 학교 공간 설명 (사진 포함 / 관리자) -->
-            <section id="view-spaces" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-slate-100"><i class="fa-solid fa-map-location-dot text-rose-400 mr-2"></i>학교 공간 가이드</h2>
-                    <button id="adminSpaceBtn" onclick="openAdminAdd('space')" class="hidden bg-rose-600 hover:bg-rose-500 text-white text-sm px-3 py-1.5 rounded-lg transition">공간 추가 (관리자)</button>
-                </div>
-                <div id="spaceGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </section>
-
-            <!-- TAB 8: 동아리 정보 (선배 경험 / 관리자) -->
-            <section id="view-clubs" class="hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-slate-100"><i class="fa-solid fa-users text-amber-400 mr-2"></i>동아리 선배들의 꿀팁 DB</h2>
-                    <button id="adminClubBtn" onclick="openAdminAdd('club')" class="hidden bg-amber-600 hover:bg-amber-500 text-white text-sm px-3 py-1.5 rounded-lg transition">동아리 추가 (관리자)</button>
-                </div>
-                <div id="clubGrid" class="space-y-4"></div>
-            </section>
-
-            <!-- TAB 9: 분실물 정보 -->
+            <!-- TAB 6: 분실물 정보 -->
             <section id="view-lost" class="hidden space-y-4">
                 <div class="flex justify-between items-center">
                     <h2 class="text-xl font-bold text-slate-100"><i class="fa-solid fa-box-open text-cyan-400 mr-2"></i>분실물 센터</h2>
@@ -285,17 +239,6 @@
             qna: [
                 { id: 1, title: "정보 수행평가 질문있습니다", content: "깃허브 블로그 배포할 때 404 오류 떠요 ㅠㅠ 해결법 알려주실 분?", time: "30분 전" }
             ],
-            teachers: [
-                { name: "김철수 선생님", subject: "수학", room: "2학년 교무실", tip: "질문하러 갈 때 개념서 풀이 먼저 보여드리면 완전 친절하게 설명해주심!" },
-                { name: "이영희 선생님", subject: "영어", room: "3학년 교무실", tip: "단어 테스트 재시험 기준 엄격하시니까 미리 단어장 다 외우고 가기." }
-            ],
-            spaces: [
-                { name: "도서관 (꿈터)", desc: "시험기간 독서실 대용으로 최적. 창가 자리가 햇살 잘 들어오고 분위기 좋음.", img: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=500&q=80" },
-                { name: "중앙 잔디밭 & 벤치", desc: "점심시간 산책 1위 코스. 버스킹 동아리 공연 때 구경하기 딱 좋은 위치.", img: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=500&q=80" }
-            ],
-            clubs: [
-                { name: "컴퓨터 동아리 (ALGO)", desc: "알고리즘 문제 풀이 및 웹사이트 제작 프로젝트 진행.", tip: "선배 팁: 면접 때 본인이 직접 코딩해본 경험을 어필하면 가산점 있음!" }
-            ],
             lost: [
                 { item: "검은색 에어팟 프로 2세대", location: "체육관 2층 관람석 3번째 줄", date: "2026-08-24", img: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=500&q=80" }
             ]
@@ -332,7 +275,7 @@
             if (pw === ADMIN_PW) {
                 isAdmin = true;
                 document.getElementById('userBadge').innerHTML = '👑 <span class="text-amber-400 font-bold">브니엘고 관리자</span>';
-                ['adminTeacherBtn', 'adminSpaceBtn', 'adminClubBtn', 'adminMealBtn', 'adminCalendarBtn'].forEach(id => {
+                ['adminMealBtn', 'adminCalendarBtn'].forEach(id => {
                     const btn = document.getElementById(id);
                     if (btn) btn.classList.remove('hidden');
                 });
@@ -396,23 +339,7 @@
         function openAdminAdd(category) {
             if (!isAdmin) return;
 
-            if (category === 'teacher') {
-                const name = prompt("선생님 성함:");
-                const subject = prompt("담당 과목:");
-                const room = prompt("교무실 위치:");
-                const tip = prompt("선생님 팁:");
-                if (name && subject) penielDb.teachers.push({ name, subject, room, tip });
-            } else if (category === 'space') {
-                const name = prompt("공간 이름:");
-                const desc = prompt("공간 설명:");
-                const img = prompt("이미지 URL:") || "https://images.unsplash.com/photo-1562774053-701939374585?w=500&q=80";
-                if (name && desc) penielDb.spaces.push({ name, desc, img });
-            } else if (category === 'club') {
-                const name = prompt("동아리명:");
-                const desc = prompt("소개:");
-                const tip = prompt("선배의 팁:");
-                if (name && desc) penielDb.clubs.push({ name, desc, tip });
-            } else if (category === 'calendar') {
+            if (category === 'calendar') {
                 const title = prompt("학사일정명:");
                 const start = prompt("날짜 (예: 2026-11-25):");
                 const end = prompt("끝나는 날짜 (하루짜리면 비워두기):") || undefined;
@@ -593,43 +520,7 @@
                 </div>
             `).join('');
 
-            // 5. 선생님 정보
-            document.getElementById('teacherGrid').innerHTML = penielDb.teachers.map(t => `
-                <div class="bg-slate-800 border border-slate-700/60 p-4 rounded-xl">
-                    <div class="flex justify-between items-center mb-2">
-                        <h4 class="font-bold text-lg text-purple-300">${t.name}</h4>
-                        <span class="text-xs bg-purple-900/50 text-purple-300 px-2 py-1 rounded">${t.subject}</span>
-                    </div>
-                    <p class="text-xs text-slate-400 mb-2">📍 위치: ${t.room}</p>
-                    <div class="bg-slate-900/50 p-2.5 rounded-lg text-xs text-slate-300 border border-slate-700/40">
-                        💡 <strong>꿀팁:</strong> ${t.tip}
-                    </div>
-                </div>
-            `).join('');
-
-            // 6. 학교 공간
-            document.getElementById('spaceGrid').innerHTML = penielDb.spaces.map(s => `
-                <div class="bg-slate-800 border border-slate-700/60 rounded-xl overflow-hidden flex flex-col">
-                    <img src="${s.img}" class="h-40 w-full object-cover" alt="">
-                    <div class="p-4">
-                        <h4 class="font-bold text-slate-200 mb-1">${s.name}</h4>
-                        <p class="text-xs text-slate-400">${s.desc}</p>
-                    </div>
-                </div>
-            `).join('');
-
-            // 7. 동아리
-            document.getElementById('clubGrid').innerHTML = penielDb.clubs.map(c => `
-                <div class="bg-slate-800 border border-slate-700/60 p-5 rounded-xl">
-                    <h3 class="font-bold text-lg text-amber-400 mb-1">${c.name}</h3>
-                    <p class="text-sm text-slate-300 mb-3">${c.desc}</p>
-                    <div class="bg-amber-950/30 border border-amber-800/40 p-3 rounded-xl text-xs text-amber-200/90">
-                        🎓 <strong>선배들의 경험담 & 팁:</strong> ${c.tip}
-                    </div>
-                </div>
-            `).join('');
-
-            // 8. 분실물
+            // 5. 분실물
             document.getElementById('lostGrid').innerHTML = penielDb.lost.map(l => `
                 <div class="bg-slate-800 border border-slate-700/60 rounded-xl overflow-hidden">
                     <img src="${l.img}" class="h-32 w-full object-cover" alt="">
@@ -656,10 +547,6 @@
 
             document.getElementById('homeLostList').innerHTML = penielDb.lost.slice(0, 2).map(l => 
                 `<div class="truncate">📍 ${l.item}</div>`
-            ).join('');
-
-            document.getElementById('homeClubList').innerHTML = penielDb.clubs.slice(0, 2).map(c => 
-                `<div class="truncate">🌟 ${c.name}</div>`
             ).join('');
 
             document.getElementById('homeFreePosts').innerHTML = penielDb.free.slice(0, 3).map(p => `
