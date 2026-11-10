@@ -169,11 +169,13 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-xl font-bold text-slate-100"><i class="fa-solid fa-calendar-days text-emerald-400 mr-2"></i>브니엘고 주요 학사 일정</h2>
-                        <p class="text-xs text-slate-400 mt-1">시험기간, 방학, 축제 일정을 미리 확인하세요.</p>
+                        <p class="text-xs text-slate-400 mt-1">2026학년도 시험·행사·휴일·방학 일정을 월별로 확인하세요.</p>
                     </div>
                     <button id="adminCalendarBtn" onclick="openAdminAdd('calendar')" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-lg transition">일정 추가 (관리자)</button>
                 </div>
+                <div id="calendarMonths" class="flex gap-2 overflow-x-auto hide-scrollbar pb-1"></div>
                 <div id="calendarList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <p class="text-xs text-slate-500">※ 「2026학년도 학사일정 세부 운영 계획」 기준이며, 학교 사정에 따라 바뀔 수 있습니다.</p>
             </section>
 
             <!-- TAB 4: 익명 자유게시판 -->
@@ -265,6 +267,8 @@
 
     <!-- 식단 데이터 (tools/convert_meals.py 로 엑셀에서 자동 생성) -->
     <script src="mealData.js"></script>
+    <!-- 학사일정 데이터 -->
+    <script src="scheduleData.js"></script>
     <script>
         // 관리자 상태 관리
         let isAdmin = false;
@@ -273,12 +277,7 @@
 
         // 브니엘고 데이터베이스
         let penielDb = {
-            calendar: [
-                { title: "2학기 개학식", date: "8월 18일(화)", tag: "학사일정", style: "bg-blue-900/40 text-blue-300 border-blue-700/50" },
-                { title: "2학기 1차 지필평가 (중간고사)", date: "10월 12일(월) ~ 10월 15일(목)", tag: "시험", style: "bg-rose-900/40 text-rose-300 border-rose-700/50" },
-                { title: "브니엘 예술제 & 동아리 발표회", date: "11월 06일(금)", tag: "행사", style: "bg-amber-900/40 text-amber-300 border-amber-700/50" },
-                { title: "2027학년도 대학수학능력시험", date: "11월 19일(목)", tag: "수능", style: "bg-purple-900/40 text-purple-300 border-purple-700/50" }
-            ],
+            calendar: (typeof scheduleData !== 'undefined') ? scheduleData : [],
             free: [
                 { id: 1, title: "오늘 급식 수제 핫도그 나온대 ㅋㅋㅋ", content: "청포도 에이드까지 완성도 미쳤다 기대중!!", time: "10분 전" },
                 { id: 2, title: "시험범위 프린트 잃어버린 사람?", content: "본관 2층 교무실 앞 복도에 떨어져있었음!", time: "1시간 전" }
@@ -415,9 +414,10 @@
                 if (name && desc) penielDb.clubs.push({ name, desc, tip });
             } else if (category === 'calendar') {
                 const title = prompt("학사일정명:");
-                const date = prompt("날짜:");
-                const tag = prompt("태그:") || "일정";
-                if (title && date) penielDb.calendar.push({ title, date, tag, style: "bg-blue-900/40 text-blue-300 border-blue-700/50" });
+                const start = prompt("날짜 (예: 2026-11-25):");
+                const end = prompt("끝나는 날짜 (하루짜리면 비워두기):") || undefined;
+                const tag = prompt("분류 (학사/시험/행사/휴일/방학):") || "행사";
+                if (title && /^\d{4}-\d{2}-\d{2}$/.test(start || '')) penielDb.calendar.push({ start, end, title, tag });
             }
             renderAll();
         }
@@ -504,24 +504,70 @@
                 `<li class="text-amber-400 font-medium pt-1">+ 더보기</li>`;
         }
 
+        // ===== 학사일정 =====
+        const TAG_STYLE = {
+            '학사': 'bg-blue-900/40 text-blue-300 border-blue-700/50',
+            '시험': 'bg-rose-900/40 text-rose-300 border-rose-700/50',
+            '행사': 'bg-amber-900/40 text-amber-300 border-amber-700/50',
+            '휴일': 'bg-red-900/40 text-red-300 border-red-700/50',
+            '방학': 'bg-purple-900/40 text-purple-300 border-purple-700/50'
+        };
+        let calendarMonth = toKey(new Date()).slice(0, 7);   // 'YYYY-MM'
+
+        function shortDate(key) {
+            const [y, m, d] = key.split('-').map(Number);
+            return `${m}/${d}(${WEEKDAYS[new Date(y, m - 1, d).getDay()]})`;
+        }
+        function eventDateText(c) {
+            return c.end && c.end !== c.start ? `${shortDate(c.start)} ~ ${shortDate(c.end)}` : shortDate(c.start);
+        }
+        function dDay(c) {
+            const today = toKey(new Date());
+            if (c.start <= today && today <= (c.end || c.start)) return '진행 중';
+            const diff = Math.round((new Date(c.start + 'T00:00') - new Date(today + 'T00:00')) / 86400000);
+            return diff > 0 ? `D-${diff}` : '';
+        }
+        // 여러 달에 걸친 일정은 걸친 달마다 보여줌
+        function inMonth(c, ym) {
+            return c.start.slice(0, 7) <= ym && ym <= (c.end || c.start).slice(0, 7);
+        }
+        function setCalendarMonth(ym) { calendarMonth = ym; renderCalendar(); }
+
+        function renderCalendar() {
+            const events = penielDb.calendar.slice().sort((x, y) => x.start.localeCompare(y.start));
+            const months = [...new Set(events.map(c => c.start.slice(0, 7)))].sort();
+            if (!months.includes(calendarMonth) && calendarMonth !== 'all') {
+                calendarMonth = months.find(m => m >= toKey(new Date()).slice(0, 7)) || 'all';
+            }
+            const chip = (ym, label) => `<button onclick="setCalendarMonth('${ym}')" class="whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold border ${ym === calendarMonth ? 'bg-emerald-600 border-emerald-500 text-white' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'}">${label}</button>`;
+            document.getElementById('calendarMonths').innerHTML = chip('all', '전체') +
+                months.map(ym => chip(ym, `${Number(ym.slice(5))}월`)).join('');
+
+            const today = toKey(new Date());
+            const list = calendarMonth === 'all' ? events : events.filter(c => inMonth(c, calendarMonth));
+            document.getElementById('calendarList').innerHTML = list.length ? list.map(c => {
+                const past = (c.end || c.start) < today;
+                return `
+                <div class="bg-slate-800 border border-slate-700/60 p-4 rounded-xl flex flex-col justify-between space-y-3 ${past ? 'opacity-50' : ''}">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs px-2.5 py-0.5 rounded-full border ${TAG_STYLE[c.tag] || TAG_STYLE['학사']}">${c.tag}</span>
+                            <span class="text-xs font-bold text-emerald-400">${past ? '지남' : dDay(c)}</span>
+                        </div>
+                        <h4 class="font-bold text-slate-100 text-base mb-1">${c.title}</h4>
+                        <p class="text-xs text-emerald-400 font-medium">📅 ${eventDateText(c)}</p>
+                    </div>
+                </div>`;
+            }).join('') : '<p class="text-sm text-slate-500">이 달에는 등록된 일정이 없습니다.</p>';
+        }
+
         // 전체 UI 데이터 렌더링
         function renderAll() {
             // 1. 급식
             renderMeals();
 
             // 2. 학사 일정
-            document.getElementById('calendarList').innerHTML = penielDb.calendar.map(c => `
-                <div class="bg-slate-800 border border-slate-700/60 p-4 rounded-xl flex flex-col justify-between space-y-3">
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs px-2.5 py-0.5 rounded-full border ${c.style}">${c.tag}</span>
-                            <i class="fa-regular fa-calendar text-slate-500"></i>
-                        </div>
-                        <h4 class="font-bold text-slate-100 text-base mb-1">${c.title}</h4>
-                        <p class="text-xs text-emerald-400 font-medium">📅 ${c.date}</p>
-                    </div>
-                </div>
-            `).join('');
+            renderCalendar();
 
             // 3. 자유게시판
             document.getElementById('freePostList').innerHTML = penielDb.free.map(p => `
@@ -598,12 +644,15 @@
             // 대시보드 미리보기 대치
             renderHomeMeal();
 
-            document.getElementById('homeCalendarList').innerHTML = penielDb.calendar.slice(0, 2).map(c => `
+            const upcoming = penielDb.calendar
+                .filter(c => (c.end || c.start) >= toKey(new Date()) && c.tag !== '방학')
+                .sort((x, y) => x.start.localeCompare(y.start)).slice(0, 3);
+            document.getElementById('homeCalendarList').innerHTML = upcoming.length ? upcoming.map(c => `
                 <div class="border-l-2 border-emerald-400 pl-2">
-                    <div class="font-bold text-slate-200 text-xs">${c.title}</div>
-                    <div class="text-[10px] text-slate-400">${c.date}</div>
+                    <div class="font-bold text-slate-200 text-xs">${c.title} <span class="text-emerald-400 font-semibold">${dDay(c)}</span></div>
+                    <div class="text-[10px] text-slate-400">${eventDateText(c)}</div>
                 </div>
-            `).join('');
+            `).join('') : '<div class="text-xs text-slate-500">다가오는 일정이 없습니다.</div>';
 
             document.getElementById('homeLostList').innerHTML = penielDb.lost.slice(0, 2).map(l => 
                 `<div class="truncate">📍 ${l.item}</div>`
