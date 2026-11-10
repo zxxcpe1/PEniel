@@ -238,7 +238,7 @@
                 { id: 1, title: "정보 수행평가 질문있습니다", content: "깃허브 블로그 배포할 때 404 오류 떠요 ㅠㅠ 해결법 알려주실 분?", time: "30분 전" }
             ],
             lost: [
-                { item: "검은색 에어팟 프로 2세대", location: "체육관 2층 관람석 3번째 줄", date: "2026-08-24", img: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=500&q=80" }
+                { id: 1, item: "검은색 에어팟 프로 2세대", location: "체육관 2층 관람석 3번째 줄", date: "2026-08-24", img: "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=500&q=80" }
             ]
         };
 
@@ -323,15 +323,53 @@
             if (activePostType === 'lost') {
                 const location = document.getElementById('lostLocationInput').value || '위치 미기재';
                 const img = document.getElementById('lostImgInput').value || 'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=500&q=80';
-                penielDb.lost.unshift({ item: title, location: location, date: "방금 전", img: img });
+                penielDb.lost.unshift({ id: Date.now(), item: title, location: location, date: "방금 전", img: img, admin: isAdmin });
             } else if (activePostType === 'free') {
-                penielDb.free.unshift({ id: Date.now(), title, content, time: "방금 전" });
+                penielDb.free.unshift({ id: Date.now(), title, content, time: "방금 전", admin: isAdmin });
             } else if (activePostType === 'qna') {
-                penielDb.qna.unshift({ id: Date.now(), title, content, time: "방금 전" });
+                penielDb.qna.unshift({ id: Date.now(), title, content, time: "방금 전", admin: isAdmin });
             }
 
             closePostModal();
             renderAll();
+        }
+
+        // ===== 게시글 도우미 =====
+        // 사용자가 쓴 글에 HTML 태그가 들어가도 그대로 글자로 보이게 함
+        function esc(text) {
+            return String(text ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        }
+        // 관리자 글을 맨 위로
+        function adminFirst(list) {
+            return list.slice().sort((a, b) => (b.admin ? 1 : 0) - (a.admin ? 1 : 0));
+        }
+        const ADMIN_BADGE = '<span class="inline-flex items-center gap-1 text-[11px] font-bold bg-amber-500 text-slate-900 px-2 py-0.5 rounded-full">👑 관리자</span>';
+        function deleteBtn(type, id) {
+            if (!isAdmin) return '';
+            return `<button onclick="event.stopPropagation(); deletePost('${type}', ${id})" class="text-xs text-rose-400 hover:text-white hover:bg-rose-600 border border-rose-500/50 px-2 py-1 rounded-lg transition" title="삭제"><i class="fa-solid fa-trash-can mr-1"></i>삭제</button>`;
+        }
+        function deletePost(type, id) {
+            if (!isAdmin) return;
+            if (!confirm('이 글을 삭제할까요?')) return;
+            penielDb[type] = penielDb[type].filter(p => p.id !== id);
+            renderAll();
+        }
+        function postCard(p, type, footer) {
+            const box = p.admin
+                ? 'bg-amber-950/40 border-2 border-amber-500/70 shadow-lg shadow-amber-900/30'
+                : 'bg-slate-800 border border-slate-700/60';
+            return `
+                <div class="${box} p-4 rounded-xl">
+                    <div class="flex justify-between items-start gap-2 mb-1">
+                        <h4 class="font-bold ${p.admin ? 'text-amber-200' : 'text-slate-200'} flex items-center gap-2 flex-wrap">${p.admin ? ADMIN_BADGE : ''}${esc(p.title)}</h4>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <span class="text-xs text-slate-500">${esc(p.time)}</span>
+                            ${deleteBtn(type, p.id)}
+                        </div>
+                    </div>
+                    <p class="text-sm ${p.admin ? 'text-amber-100/90' : 'text-slate-400'} whitespace-pre-line">${esc(p.content)}</p>
+                    ${p.admin ? '<div class="mt-2 text-xs font-semibold text-amber-400">📢 관리자가 작성한 글입니다</div>' : footer}
+                </div>`;
         }
 
         function openAdminAdd(category) {
@@ -495,37 +533,24 @@
             renderCalendar();
 
             // 3. 자유게시판
-            document.getElementById('freePostList').innerHTML = penielDb.free.map(p => `
-                <div class="bg-slate-800 border border-slate-700/60 p-4 rounded-xl">
-                    <div class="flex justify-between items-start mb-1">
-                        <h4 class="font-bold text-slate-200">${p.title}</h4>
-                        <span class="text-xs text-slate-500">${p.time}</span>
-                    </div>
-                    <p class="text-sm text-slate-400">${p.content}</p>
-                    <div class="mt-2 text-xs text-slate-500">✍️ 익명 학생</div>
-                </div>
-            `).join('');
+            document.getElementById('freePostList').innerHTML = adminFirst(penielDb.free).map(p =>
+                postCard(p, 'free', '<div class="mt-2 text-xs text-slate-500">✍️ 익명 학생</div>')).join('');
 
             // 4. Q&A
-            document.getElementById('qnaPostList').innerHTML = penielDb.qna.map(p => `
-                <div class="bg-slate-800 border border-slate-700/60 p-4 rounded-xl">
-                    <div class="flex justify-between items-start mb-1">
-                        <h4 class="font-bold text-slate-200">${p.title}</h4>
-                        <span class="text-xs text-slate-500">${p.time}</span>
-                    </div>
-                    <p class="text-sm text-slate-400">${p.content}</p>
-                    <div class="mt-2 text-xs text-teal-400">❓ 답변 대기중...</div>
-                </div>
-            `).join('');
+            document.getElementById('qnaPostList').innerHTML = adminFirst(penielDb.qna).map(p =>
+                postCard(p, 'qna', '<div class="mt-2 text-xs text-teal-400">❓ 답변 대기중...</div>')).join('');
 
             // 5. 분실물
-            document.getElementById('lostGrid').innerHTML = penielDb.lost.map(l => `
-                <div class="bg-slate-800 border border-slate-700/60 rounded-xl overflow-hidden">
-                    <img src="${l.img}" class="h-32 w-full object-cover" alt="">
-                    <div class="p-3">
-                        <h4 class="font-bold text-slate-200 text-sm">${l.item}</h4>
-                        <p class="text-xs text-slate-400">📍 습득장소: ${l.location}</p>
-                        <p class="text-xs text-slate-500">📅 날짜: ${l.date}</p>
+            document.getElementById('lostGrid').innerHTML = adminFirst(penielDb.lost).map(l => `
+                <div class="${l.admin ? 'bg-amber-950/40 border-2 border-amber-500/70 shadow-lg shadow-amber-900/30' : 'bg-slate-800 border border-slate-700/60'} rounded-xl overflow-hidden">
+                    <img src="${esc(l.img)}" class="h-32 w-full object-cover" alt="">
+                    <div class="p-3 space-y-0.5">
+                        <div class="flex justify-between items-start gap-2">
+                            <h4 class="font-bold ${l.admin ? 'text-amber-200' : 'text-slate-200'} text-sm flex items-center gap-1.5 flex-wrap">${l.admin ? ADMIN_BADGE : ''}${esc(l.item)}</h4>
+                            ${deleteBtn('lost', l.id)}
+                        </div>
+                        <p class="text-xs text-slate-400">📍 습득장소: ${esc(l.location)}</p>
+                        <p class="text-xs text-slate-500">📅 날짜: ${esc(l.date)}</p>
                     </div>
                 </div>
             `).join('');
@@ -543,17 +568,17 @@
                 </div>
             `).join('') : '<div class="text-xs text-slate-500">다가오는 일정이 없습니다.</div>';
 
-            document.getElementById('homeLostList').innerHTML = penielDb.lost.slice(0, 2).map(l => 
-                `<div class="truncate">📍 ${l.item}</div>`
+            document.getElementById('homeLostList').innerHTML = adminFirst(penielDb.lost).slice(0, 2).map(l => 
+                `<div class="truncate ${l.admin ? 'text-amber-300 font-semibold' : ''}">${l.admin ? '👑' : '📍'} ${esc(l.item)}</div>`
             ).join('');
 
-            document.getElementById('homeFreePosts').innerHTML = penielDb.free.slice(0, 3).map(p => `
-                <div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700/40 flex justify-between items-center cursor-pointer hover:border-slate-600" onclick="switchTab('free')">
-                    <div>
-                        <h4 class="text-sm font-semibold text-slate-200">${p.title}</h4>
-                        <p class="text-xs text-slate-400 line-clamp-1">${p.content}</p>
+            document.getElementById('homeFreePosts').innerHTML = adminFirst(penielDb.free).slice(0, 3).map(p => `
+                <div class="${p.admin ? 'bg-amber-950/40 border-amber-500/70' : 'bg-slate-900/50 border-slate-700/40 hover:border-slate-600'} p-3 rounded-xl border flex justify-between items-center cursor-pointer" onclick="switchTab('free')">
+                    <div class="min-w-0">
+                        <h4 class="text-sm font-semibold ${p.admin ? 'text-amber-200' : 'text-slate-200'} flex items-center gap-1.5">${p.admin ? ADMIN_BADGE : ''}<span class="truncate">${esc(p.title)}</span></h4>
+                        <p class="text-xs text-slate-400 line-clamp-1">${esc(p.content)}</p>
                     </div>
-                    <span class="text-[10px] text-slate-500 whitespace-nowrap ml-2">${p.time}</span>
+                    <span class="text-[10px] text-slate-500 whitespace-nowrap ml-2">${esc(p.time)}</span>
                 </div>
             `).join('');
         }
