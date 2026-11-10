@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ↓↓↓ 여기 이메일을 firebaseConfig.js 의 ADMIN_EMAIL 과 똑같이 바꾸세요 ↓↓↓
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == "여기에-관리자-이메일";
+    }
+
+    function text(d, field, max) {
+      return d[field] is string && d[field].size() >= 1 && d[field].size() <= max;
+    }
+    // 작성 시각은 서버 시각이어야 하고, 관리자 표시는 진짜 관리자만 붙일 수 있음
+    function common(d) {
+      return d.createdAt == request.time && d.admin is bool && (d.admin == false || isAdmin());
+    }
+    function validPost() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['title', 'content', 'admin', 'createdAt'])
+        && d.keys().hasAll(['title', 'content', 'admin', 'createdAt'])
+        && text(d, 'title', 100) && text(d, 'content', 2000) && common(d);
+    }
+
+    // 자유게시판 / Q&A : 누구나 읽기·쓰기, 수정 불가, 삭제는 관리자만
+    match /free/{postId} {
+      allow read: if true;
+      allow create: if validPost();
+      allow delete: if isAdmin();
+    }
+    match /qna/{postId} {
+      allow read: if true;
+      allow create: if validPost();
+      allow delete: if isAdmin();
+    }
+
+    // 분실물
+    match /lost/{postId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly(['item', 'location', 'img', 'admin', 'createdAt'])
+        && request.resource.data.keys().hasAll(['item', 'location', 'img', 'admin', 'createdAt'])
+        && text(request.resource.data, 'item', 100)
+        && text(request.resource.data, 'location', 100)
+        && text(request.resource.data, 'img', 500)
+        && common(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // 댓글 : 실제로 있는 글에만 달 수 있음
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly(['board', 'postId', 'content', 'key', 'admin', 'createdAt'])
+        && request.resource.data.keys().hasAll(['board', 'postId', 'content', 'key', 'admin', 'createdAt'])
+        && request.resource.data.board in ['free', 'qna']
+        && text(request.resource.data, 'postId', 40)
+        && text(request.resource.data, 'content', 300)
+        && text(request.resource.data, 'key', 40)
+        && common(request.resource.data)
+        && exists(/databases/$(database)/documents/$(request.resource.data.board)/$(request.resource.data.postId));
+      allow delete: if isAdmin();
+    }
+  }
+}
