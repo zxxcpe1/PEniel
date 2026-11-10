@@ -88,7 +88,7 @@
                     <div class="bg-slate-800 border border-amber-500/30 rounded-xl p-4 flex flex-col justify-between">
                         <div>
                             <div class="flex justify-between items-center mb-2">
-                                <h3 class="font-bold text-amber-400 text-sm flex items-center gap-1.5"><i class="fa-solid fa-utensils"></i> 오늘 중식 (브니엘고)</h3>
+                                <h3 class="font-bold text-amber-400 text-sm flex items-center gap-1.5"><i class="fa-solid fa-utensils"></i> <span id="homeMealTitle">오늘 중식 (브니엘고)</span></h3>
                                 <button onclick="switchTab('meal')" class="text-[11px] text-slate-400 hover:text-white">더보기 →</button>
                             </div>
                             <ul id="homeMealList" class="text-xs text-slate-300 space-y-1"></ul>
@@ -144,11 +144,24 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-xl font-bold text-slate-100"><i class="fa-solid fa-utensils text-amber-400 mr-2"></i>브니엘고 식단표</h2>
-                        <p class="text-xs text-slate-400 mt-1">오늘의 중식/석식 메뉴와 영양 정보입니다.</p>
+                        <p class="text-xs text-slate-400 mt-1">날짜별 중식·석식 메뉴와 영양 정보입니다.</p>
                     </div>
                     <button id="adminMealBtn" onclick="openAdminAdd('meal')" class="hidden bg-amber-600 hover:bg-amber-500 text-white text-xs px-3 py-1.5 rounded-lg transition">식단 수정 (관리자)</button>
                 </div>
+                <div class="flex items-center justify-between bg-slate-800 border border-slate-700/60 rounded-xl px-3 py-2">
+                    <button onclick="moveMealDate(-1)" class="px-3 py-1.5 rounded-lg text-slate-300 hover:bg-slate-700" aria-label="이전 날"><i class="fa-solid fa-chevron-left"></i></button>
+                    <div class="text-center">
+                        <div id="mealDateLabel" class="font-bold text-slate-100"></div>
+                        <button onclick="goMealToday()" class="text-[11px] text-amber-400 hover:text-amber-300">오늘로 이동</button>
+                    </div>
+                    <button onclick="moveMealDate(1)" class="px-3 py-1.5 rounded-lg text-slate-300 hover:bg-slate-700" aria-label="다음 날"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
                 <div id="mealGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                <details class="text-xs text-slate-400 bg-slate-800/60 border border-slate-700/60 rounded-xl p-3">
+                    <summary class="cursor-pointer text-slate-300">알레르기 번호 안내</summary>
+                    <p class="mt-2 leading-relaxed">①난류 ②우유 ③메밀 ④땅콩 ⑤대두 ⑥밀 ⑦고등어 ⑧게 ⑨새우 ⑩돼지고기 ⑪복숭아 ⑫토마토 ⑬아황산염 ⑭호두 ⑮닭고기 ⑯쇠고기 ⑰오징어 ⑱조개류(굴, 전복, 홍합 포함) ⑲잣</p>
+                    <p class="mt-1 text-slate-500">★ 학사일정 변동 시 식단은 변경될 수 있습니다.</p>
+                </details>
             </section>
 
             <!-- TAB 3: 학사 일정 -->
@@ -250,6 +263,8 @@
         </div>
     </div>
 
+    <!-- 식단 데이터 (tools/convert_meals.py 로 엑셀에서 자동 생성) -->
+    <script src="mealData.js"></script>
     <script>
         // 관리자 상태 관리
         let isAdmin = false;
@@ -258,22 +273,6 @@
 
         // 브니엘고 데이터베이스
         let penielDb = {
-            meals: [
-                {
-                    type: "오늘의 중식",
-                    date: "2026-08-24 (월)",
-                    items: ["혼합잡곡밥", "돈육김치찌개", "수제 찰핫도그", "치즈닭갈비", "깍두기", "청포도 에이드"],
-                    calories: "840 kcal",
-                    img: "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=500&q=80"
-                },
-                {
-                    type: "오늘의 석식",
-                    date: "2026-08-24 (월)",
-                    items: ["쌀밥", "우동국물", "치킨마요덮밥", "야채튀김", "배추김치", "요구르트"],
-                    calories: "790 kcal",
-                    img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80"
-                }
-            ],
             calendar: [
                 { title: "2학기 개학식", date: "8월 18일(화)", tag: "학사일정", style: "bg-blue-900/40 text-blue-300 border-blue-700/50" },
                 { title: "2학기 1차 지필평가 (중간고사)", date: "10월 12일(월) ~ 10월 15일(목)", tag: "시험", style: "bg-rose-900/40 text-rose-300 border-rose-700/50" },
@@ -423,29 +422,92 @@
             renderAll();
         }
 
+        // ===== 식단표 =====
+        const MEALS = (typeof mealData !== 'undefined') ? mealData : {};
+        const MEAL_DATES = Object.keys(MEALS).sort();
+        const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
+
+        function toKey(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+        function formatKey(key) {
+            const [y, m, d] = key.split('-').map(Number);
+            return `${m}월 ${d}일 (${WEEKDAYS[new Date(y, m - 1, d).getDay()]})`;
+        }
+        // 오늘 식단이 없으면(주말 등) 가장 가까운 다음 급식일, 그것도 없으면 마지막 급식일
+        function nearestMealKey() {
+            const today = toKey(new Date());
+            return MEAL_DATES.find(k => k >= today) || MEAL_DATES[MEAL_DATES.length - 1];
+        }
+        let mealKey = nearestMealKey();
+
+        function moveMealDate(step) {
+            const i = MEAL_DATES.indexOf(mealKey);
+            const next = MEAL_DATES[i + step];
+            if (next) { mealKey = next; renderMeals(); }
+        }
+        function goMealToday() { mealKey = nearestMealKey(); renderMeals(); }
+
+        function mealItemsHtml(items) {
+            return items.map(it => `
+                <li class="flex items-start gap-1.5"><span class="text-amber-400">•</span>
+                    <span>${it.name}${it.allergy.length ? ` <sup class="text-[10px] text-slate-500">${it.allergy.join('.')}</sup>` : ''}</span>
+                </li>`).join('');
+        }
+
+        function mealCardHtml(label, meal) {
+            let body;
+            if (!meal) body = '<p class="text-sm text-slate-500">등록된 식단이 없습니다.</p>';
+            else if (meal.note) body = `<p class="text-sm text-slate-300">📢 ${meal.note}</p>`;
+            else body = `<ul class="text-sm text-slate-200 space-y-1 mb-3">${mealItemsHtml(meal.items)}</ul>`;
+            const nutri = meal && meal.kcal ? `
+                <div class="text-xs text-slate-400 border-t border-slate-700/50 pt-2 grid grid-cols-2 gap-1">
+                    <span>🔥 열량 ${meal.kcal} kcal</span><span>💪 단백질 ${meal.protein} g</span>
+                    <span>🦴 칼슘 ${meal.calcium} mg</span><span>🩸 철분 ${meal.iron} mg</span>
+                </div>` : '';
+            return `
+                <div class="bg-slate-800 border border-slate-700/60 rounded-xl p-5 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-0.5 rounded-full">${label}</span>
+                            <span class="text-xs text-slate-400">🏫 브니엘고 급식실</span>
+                        </div>
+                        ${body}
+                    </div>
+                    ${nutri}
+                </div>`;
+        }
+
+        function renderMeals() {
+            const label = document.getElementById('mealDateLabel');
+            const grid = document.getElementById('mealGrid');
+            if (!mealKey) {
+                label.textContent = '식단 정보 없음';
+                grid.innerHTML = '<p class="text-sm text-slate-500">아직 등록된 식단표가 없습니다.</p>';
+                return;
+            }
+            const day = MEALS[mealKey] || {};
+            label.textContent = formatKey(mealKey) + (mealKey === toKey(new Date()) ? ' · 오늘' : '');
+            grid.innerHTML = mealCardHtml('중식', day.lunch) + mealCardHtml('석식', day.dinner);
+        }
+
+        function renderHomeMeal() {
+            const key = nearestMealKey();
+            const lunch = key && MEALS[key] && MEALS[key].lunch;
+            const isToday = key === toKey(new Date());
+            document.getElementById('homeMealTitle').textContent =
+                isToday || !key ? '오늘 중식 (브니엘고)' : `${formatKey(key)} 중식`;
+            const list = document.getElementById('homeMealList');
+            if (!lunch) { list.innerHTML = '<li class="text-slate-500">등록된 식단이 없습니다.</li>'; return; }
+            if (lunch.note) { list.innerHTML = `<li>📢 ${lunch.note}</li>`; return; }
+            list.innerHTML = lunch.items.slice(0, 4).map(i => `<li>• ${i.name}</li>`).join('') +
+                `<li class="text-amber-400 font-medium pt-1">+ 더보기</li>`;
+        }
+
         // 전체 UI 데이터 렌더링
         function renderAll() {
             // 1. 급식
-            document.getElementById('mealGrid').innerHTML = penielDb.meals.map(m => `
-                <div class="bg-slate-800 border border-slate-700/60 rounded-xl overflow-hidden flex flex-col md:flex-row">
-                    <img src="${m.img}" class="h-44 md:h-auto md:w-2/5 object-cover" alt="">
-                    <div class="p-5 flex-1 flex flex-col justify-between">
-                        <div>
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-0.5 rounded-full">${m.type}</span>
-                                <span class="text-xs text-slate-400">${m.date}</span>
-                            </div>
-                            <ul class="text-sm text-slate-200 space-y-1 mb-3">
-                                ${m.items.map(item => `<li class="flex items-center gap-1.5"><span class="text-amber-400">•</span> ${item}</li>`).join('')}
-                            </ul>
-                        </div>
-                        <div class="text-xs text-slate-400 border-t border-slate-700/50 pt-2 flex justify-between">
-                            <span>🔥 열량: ${m.calories}</span>
-                            <span>🏫 브니엘고 급식실</span>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+            renderMeals();
 
             // 2. 학사 일정
             document.getElementById('calendarList').innerHTML = penielDb.calendar.map(c => `
@@ -534,10 +596,7 @@
             `).join('');
 
             // 대시보드 미리보기 대치
-            const todayLunch = penielDb.meals[0];
-            if (todayLunch) {
-                document.getElementById('homeMealList').innerHTML = todayLunch.items.slice(0, 4).map(i => `<li>• ${i}</li>`).join('') + `<li class="text-amber-400 font-medium pt-1">+ 더보기</li>`;
-            }
+            renderHomeMeal();
 
             document.getElementById('homeCalendarList').innerHTML = penielDb.calendar.slice(0, 2).map(c => `
                 <div class="border-l-2 border-emerald-400 pl-2">
